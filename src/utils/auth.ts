@@ -1,8 +1,8 @@
 import { sign } from '@noble/ed25519';
 import bs58 from 'bs58';
 
-// Environment variables
-const BASE_URL = process.env.WOOFI_BASE_ENDPOINT || "https://testnet-api.orderly.org";
+// Environment variables - default to mainnet to match MCP configuration
+const BASE_URL = process.env.WOOFI_BASE_ENDPOINT || "https://api.orderly.org";
 const API_KEY = process.env.WOOFI_API_KEY;
 const SECRET_KEY = process.env.WOOFI_SECRET_KEY;
 const ACCOUNT_ID = process.env.WOOFI_ACCOUNT_ID;
