@@ -42,11 +42,13 @@ export async function createAuthHeaders(method, requestPath, body) {
     }
     const timestamp = Date.now().toString();
     const signature = await createSignature(timestamp, method, requestPath, body);
+    // Format the API key with ed25519 prefix if not already present
+    const formattedApiKey = API_KEY.startsWith('ed25519:') ? API_KEY : `ed25519:${API_KEY}`;
     return {
         "Content-Type": method === "GET" || method === "DELETE" ? "application/x-www-form-urlencoded" : "application/json",
         "orderly-timestamp": timestamp,
         "orderly-account-id": ACCOUNT_ID,
-        "orderly-key": API_KEY,
+        "orderly-key": formattedApiKey,
         "orderly-signature": signature
     };
 }
