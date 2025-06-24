@@ -34,6 +34,21 @@
                 "--key",
                 "d7b9248a-dede-410a-b259-1f8b3b1b37d7"
             ]
+        },
+        "woofi-pro": {
+            "command": "npx",
+            "args": [
+                "-y", 
+                "git+https://github.com/DaunteEth/execution-agent.git"
+            ],
+            "env": {
+                "WOOFI_API_KEY": "6Nn7hUFANgm2wbvy3A43ckuqFKqDCeggnae3219T7Yyq",
+                "WOOFI_SECRET_KEY": "5Hd7DLap5XV5qP3tkTYKwrbkiB1mzc2v9gk5U1K52FDq",
+                "WOOFI_BASE_ENDPOINT": "https://api.orderly.org",
+                "WOOFI_ACCOUNT_ID": "0xd8bc14ea4e7ab8c6ce4e832b1b7ee03f982295002312904d56b169ffb560f3db",
+                "WOOFI_CHAIN_ID": "42161",
+                "WOOFI_BROKER_ID": "woofi_pro"
+            }
         }
         
     }
