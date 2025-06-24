@@ -133,3 +133,70 @@ The WOOFi Pro MCP Server is now **fully functional** with Cursor IDE integration
 ---
 
 **Problem Solved Thanks To**: Analysis of your working Python MCP server pattern! 🙏
+
+# WOOFi Pro MCP Server - Development Status
+
+## ✅ **COMPLETED**
+
+### 🔧 **Authentication System Overhaul**
+- **FIXED**: Complete rewrite of authentication system to use **ed25519** signatures instead of HMAC-SHA256
+- **IMPLEMENTED**: Proper message construction following [official Orderly Network documentation](https://orderly.network/docs/build-on-omnichain/evm-api/api-authentication): `timestamp + method + path + body`
+- **ADDED**: Base58 key decoding and base64 URL-safe signature encoding
+- **CREATED**: Centralized authentication utility (`src/utils/auth.ts`) used by all endpoint modules
+- **DEPENDENCIES**: Added `@noble/ed25519` and `bs58` for proper cryptographic operations
+
+### 📁 **Code Architecture**
+- **MODULARIZED**: Removed duplicate authentication code from all endpoint files
+- **CENTRALIZED**: All endpoints now import from shared `src/utils/auth.js`
+- **STANDARDIZED**: Consistent async/await pattern for authentication headers
+- **ORGANIZED**: Proper separation of concerns following project structure rules
+
+### 🛠️ **Technical Improvements**
+- **LIBRARIES**: Installed and configured proper crypto libraries for ed25519 operations
+- **ERROR HANDLING**: Improved error messages and validation
+- **BUILD**: Successful TypeScript compilation with updated authentication system
+- **ENDPOINTS**: Updated all endpoint files (account, orders, assets, positions, liquidations, funding, woofi)
+
+## 🚧 **IN PROGRESS**
+
+### 🔑 **Authentication Testing**
+- **ISSUE**: Still receiving "orderly key error" (-1004) from API
+- **INVESTIGATION**: Need to verify API keys and account configuration
+- **TESTING**: Need to test with testnet vs mainnet endpoints
+
+### 🌐 **API Configuration**
+- **ENDPOINT**: Currently using testnet endpoint (`testnet-api.orderly.org`)
+- **KEYS**: May need to verify key format and account registration status
+- **CONFIG**: MCP configuration using GitHub repo instead of local build
+
+## 📋 **TODO**
+
+### 🧪 **Testing & Validation**
+- [ ] Test authentication with testnet API keys
+- [ ] Verify account registration and key validity
+- [ ] Test individual endpoint responses
+- [ ] Validate response formats against official documentation
+
+### 📊 **API Integration**
+- [ ] Verify correct API endpoints for all functions
+- [ ] Test order creation and management
+- [ ] Test asset and position queries
+- [ ] Test WOOFi-specific endpoints
+
+### 🔧 **Configuration**
+- [ ] Update MCP configuration to use local build
+- [ ] Verify environment variable setup
+- [ ] Test with both testnet and mainnet configurations
+
+## 📈 **Recent Progress**
+
+**✅ Major Authentication Fix**: Successfully identified and fixed the core authentication issue. The previous implementation was using HMAC-SHA256 instead of the required ed25519 signature algorithm specified in the [Orderly Network API documentation](https://orderly.network/docs/build-on-omnichain/evm-api/api-authentication).
+
+**✅ Code Quality**: Implemented proper modular architecture with centralized authentication utility, eliminating code duplication across endpoint files.
+
+**🚧 Current Challenge**: Working to resolve remaining "orderly key error" which may be related to key format, account registration, or endpoint configuration.
+
+---
+
+*Last Updated: January 2025*
+*Following official [Orderly Network API Authentication](https://orderly.network/docs/build-on-omnichain/evm-api/api-authentication) documentation*
