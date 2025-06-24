@@ -39,7 +39,8 @@
             "command": "npx",
             "args": [
                 "-y", 
-                "git+https://github.com/DaunteEth/execution-agent.git"
+                "git+https://github.com/DaunteEth/execution-agent.git",
+                "woofi-pro"
             ],
             "env": {
                 "WOOFI_API_KEY": "6Nn7hUFANgm2wbvy3A43ckuqFKqDCeggnae3219T7Yyq",

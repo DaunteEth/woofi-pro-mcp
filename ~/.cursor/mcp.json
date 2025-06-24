@@ -1,0 +1,107 @@
+{
+  "mcpServers": {
+    "server-sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery-ai/server-sequential-thinking",
+        "--key",
+        "d7b9248a-dede-410a-b259-1f8b3b1b37d7"
+      ]
+    },
+    "perplexity-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@arjunkmrm/perplexity-search",
+        "--key",
+        "d7b9248a-dede-410a-b259-1f8b3b1b37d7",
+        "--profile",
+        "future-secretary-Qx3XkJ"
+      ]
+    },
+    "context7-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@upstash/context7-mcp",
+        "--key",
+        "d7b9248a-dede-410a-b259-1f8b3b1b37d7"
+      ]
+    },
+    "woofi-pro": {
+      "command": "npx",
+      "args": [
+        "-y", 
+        "git+https://github.com/DaunteEth/execution-agent.git",
+        "woofi-pro"
+      ],
+      "env": {
+        "WOOFI_API_KEY": "6Nn7hUFANgm2wbvy3A43ckuqFKqDCeggnae3219T7Yyq",
+        "WOOFI_SECRET_KEY": "5Hd7DLap5XV5qP3tkTYKwrbkiB1mzc2v9gk5U1K52FDq",
+        "WOOFI_BASE_ENDPOINT": "https://api.orderly.org",
+        "WOOFI_ACCOUNT_ID": "0xd8bc14ea4e7ab8c6ce4e832b1b7ee03f982295002312904d56b169ffb560f3db",
+        "WOOFI_CHAIN_ID": "42161",
+        "WOOFI_BROKER_ID": "woofi_pro"
+      }
+    },
+    "osp_marketing_tools": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/open-strategy-partners/osp_marketing_tools@main",
+        "osp_marketing_tools"
+      ]
+    },
+    "filesystem-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@cyanheads/filesystem-mcp-server",
+        "--key",
+        "d7b9248a-dede-410a-b259-1f8b3b1b37d7"
+      ]
+    },
+    "playwright-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@executeautomation/playwright-mcp-server",
+        "--key",
+        "d7b9248a-dede-410a-b259-1f8b3b1b37d7"
+      ]
+    },
+    "agentic-control-framework": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@FutureAtoms/agentic-control-framework",
+        "--key",
+        "d7b9248a-dede-410a-b259-1f8b3b1b37d7"
+      ]
+    },
+    "coingecko-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@nic0xflamel/coingecko-mcp-server",
+        "--key",
+        "d7b9248a-dede-410a-b259-1f8b3b1b37d7"
+      ]
+    }
+  }
+} 
