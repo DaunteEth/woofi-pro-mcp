@@ -1,0 +1,20 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 🔗 API Integration & Modularization Rules
+
+1. **Modularize** per Orderly’s official categorization (see https://api.orderly.org/docs):  
+   - `account.ts` → `/v1/account`, `/v1/positions`, `/v1/orders?status=open`  
+   - `orders.ts` → `/v1/order`, `/v1/batch-order`, `/v1/algo-order`, `/v1/order/{id}`  
+   - `assets.ts` → `/v1/asset/history`, `/v1/asset/holding`, `/v1/withdraw_request`  
+   - `positions.ts` → `/v1/positions`  
+   - `liquidations.ts` → `/v1/liquidation`  
+   - `funding.ts` → `/v1/funding_rates`  
+   - `woofi.ts` → `{{env.WOOFI_BASE_ENDPOINT}}/evm-api/restful-api/private/*`  
+2. **Clients** in `src/endpoints/` handle signing, headers, and JSON parsing.  
+3. **No inline URLs** in `index.ts` or business logic—import from endpoint modules.  
+4. **Orderly docs**: https://orderly.network/docs/build-on-omnichain/evm-api/introduction  
+5. **WOOFi docs**: https://learn.woo.org/  
+6. **Rule file name**: `api-integration-rule.md`.  

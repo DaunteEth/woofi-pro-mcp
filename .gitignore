@@ -1,0 +1,8 @@
+# Dependencies
+node_modules/
+
+# Smithery artifacts (no longer used)
+.smithery/
+smithery.yaml
+plugin-manifest.json
+.env

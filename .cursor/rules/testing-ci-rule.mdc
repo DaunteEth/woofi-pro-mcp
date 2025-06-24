@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 🧪 Testing & CI Rules
+
+1. **Tests** in `tests/` alongside each endpoint module (`account.test.ts`, etc.).  
+2. Hit real or sandbox endpoints—**no mocks**. Use environment toggles for sandbox vs. prod.  
+3. Aim for ≥80% coverage per module; CI fails on lower coverage.  
+4. Use **Jest** with path filters: only run tests for changed files/dirs.  
+5. **status.md** must be updated in `test` stage to reflect test pass/fail and coverage.  
+6. **CI Workflow**:  
+   - `npm ci`  
+   - `npm run lint`  
+   - `npm run test`  
+   - `npm run build`  
+7. **Rule file name**: `testing-ci-rule.md`.  

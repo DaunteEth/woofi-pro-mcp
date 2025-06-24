@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 📛 Naming Conventions
+
+1. **Files & Folders**: lowercase with dashes (e.g. `account.ts`, `liquidations.ts`).  
+2. **Functions**: `camelCase` (e.g. `getAccountInfo()`).  
+3. **Classes/Interfaces**: `PascalCase` (e.g. `OrderParams`).  
+4. **Constants**: `UPPER_SNAKE_CASE` (e.g. `WOOFI_API_KEY`).  
+5. **Zod schema vars**: end with `Schema` (e.g. `orderParamsSchema`).  
+6. **Smithery manifest tools**: `snake_case` matching your function names.  
+7. **Rule file name**: `naming-conventions-rule.md`.  

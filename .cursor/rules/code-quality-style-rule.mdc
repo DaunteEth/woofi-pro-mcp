@@ -1,0 +1,15 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 🖋️ Code Quality & Style Rules (TypeScript)
+
+1. Follow **TypeScript best practices** and [Airbnb TS style](https://github.com/airbnb/javascript/tree/master/packages/eslint-config-airbnb-typescript).  
+2. Use **type annotations** everywhere; avoid `any`. Validate inputs via **Zod schemas**.  
+3. Functions ≤50 lines, single-purpose—extract helpers into `src/utils/` when needed.  
+4. **Error handling**: always catch and rethrow with context; never swallow errors.  
+5. **Imports**: group external packages, then absolute imports, then relative—alphabetical within groups.  
+6. Use `async/await`; wrap external calls with retries (e.g. `p-retry`) and log at appropriate levels (`INFO`, `WARN`, `ERROR`).  
+7. **Linters & Formatters**: ESLint + Prettier, hooked into pre-commit (Husky).  
+8. **Rule file name**: `code-quality-style-rule.md`.  

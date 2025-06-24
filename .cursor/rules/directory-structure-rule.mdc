@@ -1,0 +1,33 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+1. **Maintain** this hierarchy—do not relocate or duplicate:  
+
+
+my-woofi-mcp/
+├── .env
+├── .gitignore
+├── plugin-manifest.json
+├── smithery.yaml
+├── tsconfig.json
+├── package.json
+├── src/
+│   ├── index.ts
+│   └── endpoints/
+│       ├── account.ts
+│       ├── orders.ts
+│       ├── assets.ts
+│       ├── positions.ts
+│       ├── liquidations.ts
+│       ├── funding.ts
+│       └── woofi.ts
+└── .cursor/
+└── mcp.json
+
+
+2. **Each module** in `src/endpoints/` maps to one of Orderly’s categories (Account, Orders, Assets, Positions, Liquidations, Funding) or WOOFi.  
+3. **`src/index.ts`** only wires up the MCP server and imports endpoint modules—no inline HTTP logic.  
+4. **Configuration files** (`.env`, `plugin-manifest.json`, `smithery.yaml`, `.cursor/mcp.json`) stay at project root.  
+5. **Rule file name**: `directory-structure-rule.md`.
