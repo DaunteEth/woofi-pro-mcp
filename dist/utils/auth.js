@@ -147,6 +147,7 @@ async function createAuthHeaders(method, fullUrl, body) {
 export async function signAndSendRequest(method, endpoint, data) {
     const url = `${BASE_URL}${endpoint}`;
     // Create authentication headers using full URL (matches official example)
+    // AUTH_VERSION: 1.0.1 - FIXED ed25519: prefix and signature encoding
     const headers = await createAuthHeaders(method, url, data);
     // Prepare request options
     const options = {
@@ -158,12 +159,6 @@ export async function signAndSendRequest(method, endpoint, data) {
         options.body = JSON.stringify(data);
     }
     console.log(`🔐 Making authenticated ${method} request to: ${url}`);
-    console.log('📋 Headers:', Object.keys(headers).map(k => `${k}: ${k.includes('signature') ? '[SIGNATURE]' : headers[k]}`));
-    console.log('🔍 DEBUG - Full headers for troubleshooting:');
-    console.log('  orderly-timestamp:', headers['orderly-timestamp']);
-    console.log('  orderly-account-id:', headers['orderly-account-id']);
-    console.log('  orderly-key:', headers['orderly-key']);
-    console.log('  orderly-signature:', headers['orderly-signature']);
     const response = await fetch(url, options);
     if (!response.ok) {
         const errorText = await response.text();

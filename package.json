@@ -1,6 +1,6 @@
 {
 	"name": "woofi-pro",
-	"version": "1.0.0",
+	  "version": "1.0.1",
 	"description": "WOOFi Pro & Orderly trading tools",
 	"main": "dist/index.js",
 	"module": "./src/index.ts",

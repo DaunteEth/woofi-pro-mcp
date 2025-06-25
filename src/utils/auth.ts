@@ -187,6 +187,7 @@ export async function signAndSendRequest<T = any>(
   const url = `${BASE_URL}${endpoint}`;
   
   // Create authentication headers using full URL (matches official example)
+  // AUTH_VERSION: 1.0.1 - FIXED ed25519: prefix and signature encoding
   const headers = await createAuthHeaders(method, url, data);
   
   // Prepare request options
@@ -201,12 +202,6 @@ export async function signAndSendRequest<T = any>(
   }
   
   console.log(`🔐 Making authenticated ${method} request to: ${url}`);
-  console.log('📋 Headers:', Object.keys(headers).map(k => `${k}: ${k.includes('signature') ? '[SIGNATURE]' : headers[k]}`));
-  console.log('🔍 DEBUG - Full headers for troubleshooting:');
-  console.log('  orderly-timestamp:', headers['orderly-timestamp']);
-  console.log('  orderly-account-id:', headers['orderly-account-id']);
-  console.log('  orderly-key:', headers['orderly-key']);
-  console.log('  orderly-signature:', headers['orderly-signature']);
   
   const response = await fetch(url, options);
   
