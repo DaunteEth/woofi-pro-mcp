@@ -1,10 +1,12 @@
 #!/usr/bin/env node
+import { Command } from "commander";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
+import { configureWOOFiProForClient } from "./utils/auto-config.js";
 // Hardcoded configuration values (non-sensitive, standard values)
 const WOOFI_BASE_ENDPOINT = "https://api.orderly.org";
 const WOOFI_BROKER_ID = "woofi_pro";
@@ -124,8 +126,73 @@ function validateAuthenticationConfig() {
         return false;
     }
 }
+// CLI argument parsing and auto-configuration mode
+async function handleCLICommands() {
+    const program = new Command();
+    program
+        .name('woofi-pro')
+        .description('WOOFi Pro MCP Server with auto-configuration')
+        .version('1.0.1');
+    program
+        .option('--client <client>', 'Target MCP client: claude, cursor, vscode, windsurf')
+        .option('--api-key <key>', 'WOOFi API Key for configuration')
+        .option('--secret-key <key>', 'WOOFi Secret Key for configuration')
+        .option('--account-id <id>', 'WOOFi Account ID for configuration')
+        .parse();
+    const options = program.opts();
+    // Check if user wants client-specific configuration
+    if (options.client || options.apiKey || options.secretKey || options.accountId) {
+        console.log('🚀 WOOFi Pro MCP Server - Client Configuration Mode');
+        console.log('');
+        // Validate all required options are provided
+        if (!options.client || !options.apiKey || !options.secretKey || !options.accountId) {
+            console.error('❌ Client configuration requires all four options:');
+            console.error('   --client <claude|cursor|vscode|windsurf>');
+            console.error('   --api-key <your_api_key>');
+            console.error('   --secret-key <your_secret_key>');
+            console.error('   --account-id <your_account_id>');
+            console.error('');
+            console.error('💡 Examples:');
+            console.error('   # Configure for Claude Desktop');
+            console.error('   npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \\');
+            console.error('     --client claude --api-key=your_key --secret-key=your_secret --account-id=your_id');
+            console.error('');
+            console.error('   # Configure for Cursor IDE');
+            console.error('   npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \\');
+            console.error('     --client cursor --api-key=your_key --secret-key=your_secret --account-id=your_id');
+            process.exit(1);
+        }
+        // Validate client type
+        const validClients = ['claude', 'cursor', 'vscode', 'windsurf'];
+        if (!validClients.includes(options.client)) {
+            console.error(`❌ Invalid client: ${options.client}`);
+            console.error(`   Supported clients: ${validClients.join(', ')}`);
+            process.exit(1);
+        }
+        // Perform client-specific configuration
+        const credentials = {
+            apiKey: options.apiKey,
+            secretKey: options.secretKey,
+            accountId: options.accountId
+        };
+        try {
+            await configureWOOFiProForClient(options.client, credentials);
+            process.exit(0);
+        }
+        catch (error) {
+            console.error(`❌ Configuration failed for ${options.client}:`, error);
+            process.exit(1);
+        }
+    }
+    // No CLI options provided, continue with normal MCP server mode
+    return false;
+}
 async function main() {
     try {
+        // Check for CLI auto-configuration mode first
+        const isAutoConfig = await handleCLICommands();
+        if (isAutoConfig)
+            return;
         // Initialize config
         initializeConfig();
         // Validate authentication configuration

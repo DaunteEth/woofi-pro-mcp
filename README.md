@@ -7,12 +7,15 @@ A **Model Context Protocol (MCP)** server providing **18 comprehensive trading t
 
 ## ✨ Features
 
+- **🎯 Platform-Specific Configuration**: Smithery-style commands for precise MCP client targeting
 - **18 Trading Tools**: Complete suite for DeFi and derivatives trading
 - **Orderly Network API**: Direct integration with institutional-grade infrastructure  
 - **Universal Compatibility**: Works with Cursor, Claude Desktop, Windsurf, and all MCP clients
-- **Simple 3-Step Setup**: Just copy .env.example → .env → add credentials
-- **CCXT-Style Security**: API keys ONLY in .env files, never in MCP config
+- **Flexible Setup**: Auto-config, .env files, OR direct config - all methods supported
+- **CCXT-Style Security**: API keys never hardcoded in our repo, always user-provided
 - **Automatic Authentication**: Seamless ed25519 signature-based auth
+- **Multi-Platform Support**: Claude Desktop, Cursor IDE, VSCode, and Windsurf
+- **Safe Config Management**: Creates backups before making any changes
 
 ## 🎯 Available Tools
 
@@ -29,17 +32,64 @@ A **Model Context Protocol (MCP)** server providing **18 comprehensive trading t
 
 ## 🚀 Universal Setup (CCXT-Style)
 
-### 3-Step Setup (Works Everywhere!)
+### Choose Your Setup Method:
 
+**🎯 Option A: Platform-Specific Configuration** *(NEW! Smithery-Style Commands)*
+
+**For Claude Desktop:**
+```bash
+npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \
+  --client claude \
+  --api-key=your_api_key \
+  --secret-key=your_secret_key \
+  --account-id=your_account_id
+```
+
+**For Cursor IDE:**
+```bash
+npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \
+  --client cursor \
+  --api-key=your_api_key \
+  --secret-key=your_secret_key \
+  --account-id=your_account_id
+```
+
+**For VSCode:**
+```bash
+npx -y git+https://github.com/DaunteEh/execution-agent.git woofi-pro \
+  --client vscode \
+  --api-key=your_api_key \
+  --secret-key=your_secret_key \
+  --account-id=your_account_id
+```
+
+**For Windsurf:**
+```bash
+npx -y git+https://github.com/DaunteEh/execution-agent.git woofi-pro \
+  --client windsurf \
+  --api-key=your_api_key \
+  --secret-key=your_secret_key \
+  --account-id=your_account_id
+```
+
+*✅ Advantages: **Precise targeting**, follows MCP standards, explicit control*
+
+**🟦 Option B: .env File Method** *(Recommended for development)*
 ```bash
 # 1. Copy environment template
 cp .env.example .env
-
 # 2. Edit .env with your API credentials
-# (just 3 variables needed!)
-
 # 3. Use simple MCP config (no env vars!)
 ```
+*✅ Advantages: Keep secrets in gitignored files, easy to manage multiple environments*
+
+**🟩 Option C: Config File Method** *(Manual configuration)*
+```bash
+# 1. Add credentials directly to your MCP config
+# 2. No .env file needed!
+# 3. Everything in one place
+```
+*✅ Advantages: Full control, custom configurations, manual environment management*
 
 **✅ Supported Platforms:**
 - **Cursor IDE** 
@@ -47,10 +97,74 @@ cp .env.example .env
 - **Windsurf**
 - **Any MCP Client**
 
-### Platform-Specific Configuration
+## 🎯 Platform-Specific Configuration (NEW!)
 
-#### Cursor IDE (`.cursor/mcp.json`)
+**Choose your platform and configure instantly** - Smithery-style commands:
 
+### **Claude Desktop** 
+```bash
+npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \
+  --client claude \
+  --api-key=your_orderly_api_key_here \
+  --secret-key=your_orderly_secret_key_here \
+  --account-id=your_account_id_here
+```
+
+### **Cursor IDE**
+```bash
+npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \
+  --client cursor \
+  --api-key=your_orderly_api_key_here \
+  --secret-key=your_orderly_secret_key_here \
+  --account-id=your_account_id_here
+```
+
+### **VSCode**
+```bash
+npx -y git+https://github.com/DaunteEh/execution-agent.git woofi-pro \
+  --client vscode \
+  --api-key=your_orderly_api_key_here \
+  --secret-key=your_orderly_secret_key_here \
+  --account-id=your_account_id_here
+```
+
+### **Windsurf**
+```bash
+npx -y git+https://github.com/DaunteEh/execution-agent.git woofi-pro \
+  --client windsurf \
+  --api-key=your_orderly_api_key_here \
+  --secret-key=your_orderly_secret_key_here \
+  --account-id=your_account_id_here
+```
+
+**What this does:**
+- 🎯 **Targets specific platform** - Configure exactly what you want
+- 📋 **Creates backups** of existing configurations
+- ⚙️ **Updates your MCP config** with WOOFi Pro server + credentials
+- ✅ **Ready to use immediately** - just restart your MCP application!
+
+**Example output:**
+```
+🚀 Configuring WOOFi Pro for CLAUDE...
+🎯 Target: Claude Desktop
+📂 Config: /Users/username/Library/Application Support/Claude/claude_desktop_config.json
+🎉 Configuration complete for Claude Desktop!
+📱 Please restart Claude Desktop to load the new configuration.
+```
+
+---
+
+### Manual Configuration Options
+
+#### 🟦 Option B: .env File Method
+
+**Step 1: Create .env file**
+```bash
+cp .env.example .env
+# Edit .env with your credentials
+```
+
+**Step 2: Simple config (any platform)**
 ```json
 {
   "mcpServers": {
@@ -66,7 +180,9 @@ cp .env.example .env
 }
 ```
 
-#### Claude Desktop
+#### 🟩 Option C: Config File Method (No .env needed!)
+
+**Claude Desktop** *(Manual setup)*
 
 **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
 **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`  
@@ -79,38 +195,79 @@ cp .env.example .env
       "command": "npx",
       "args": [
         "-y",
-        "git+https://github.com/DaunteEh/execution-agent.git",
+        "git+https://github.com/DaunteEth/execution-agent.git",
         "woofi-pro"
-      ]
+      ],
+      "env": {
+        "WOOFI_API_KEY": "your_orderly_api_key_here",
+        "WOOFI_SECRET_KEY": "your_orderly_secret_key_here",
+        "WOOFI_ACCOUNT_ID": "your_account_id_here"
+      }
     }
   }
 }
 ```
 
-#### Windsurf & Other MCP Clients
+**Cursor IDE** *(`.cursor/mcp.json`)*
+```json
+{
+  "mcpServers": {
+    "woofi-pro": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "git+https://github.com/DaunteEth/execution-agent.git",
+        "woofi-pro"
+      ],
+      "env": {
+        "WOOFI_API_KEY": "your_orderly_api_key_here",
+        "WOOFI_SECRET_KEY": "your_orderly_secret_key_here",
+        "WOOFI_ACCOUNT_ID": "your_account_id_here"
+      }
+    }
+  }
+}
+```
 
-Use the same clean configuration - no environment variables needed in config files!
+**Windsurf & Other MCP Clients**
+
+Use either approach - both are supported by the MCP standard!
+
+> **🔒 Security Note**: Both approaches are equally secure! Option A keeps secrets in .env files (gitignored), Option B keeps them in your local MCP config (never shared). Our codebase never contains any secrets - they're always user-provided.
 
 ## 🔧 Environment Setup
 
-### 1. Copy Template
-```bash
-cp .env.example .env
-```
-
-### 2. Get API Credentials
+### 🔑 Get API Credentials (Required for both methods)
 1. **Visit**: [WOOFi Pro](https://pro.woo.org)
 2. **Complete KYC**: Identity verification
 3. **Generate API Keys**: API Management → Create keys
 4. **Permissions**: Enable `read` and `trading`
 
-### 3. Edit .env File
+### 🟦 Option A: .env File Setup
+
+**1. Copy Template**
+```bash
+cp .env.example .env
+```
+
+**2. Edit .env File**
 ```bash
 # Only 3 variables needed!
 WOOFI_API_KEY=your_orderly_api_key_here
 WOOFI_SECRET_KEY=your_orderly_secret_key_here
 WOOFI_ACCOUNT_ID=your_account_id_here
 ```
+
+### 🟩 Option B: Direct Config Setup
+
+**1. Get your 3 credentials from step above**
+
+**2. Add them directly to your MCP config** (see examples above)
+- Replace `your_orderly_api_key_here` with your actual API key
+- Replace `your_orderly_secret_key_here` with your actual secret key  
+- Replace `your_account_id_here` with your actual account ID
+
+**3. Restart your MCP client** (Claude Desktop, Cursor, etc.)
 
 ### 🔒 Security: Hardcoded vs Configurable
 
