@@ -1,12 +1,12 @@
 import { signAndSendRequest, validateConfig } from '../utils/auth.js';
 /**
- * Get account information
+ * Get account information (using key info endpoint)
  */
 export async function getAccountInfo() {
     validateConfig();
     console.log('📋 Getting account info...');
     try {
-        const result = await signAndSendRequest('GET', '/v1/client/info');
+        const result = await signAndSendRequest('GET', '/v1/client/key_info');
         console.log('✅ Account info retrieved successfully:', result);
         return result;
     }

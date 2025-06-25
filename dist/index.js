@@ -10,6 +10,8 @@ import * as Positions from "./endpoints/positions.js";
 import * as Liquidations from "./endpoints/liquidations.js";
 import * as Funding from "./endpoints/funding.js";
 import * as WoofiClient from "./endpoints/woofi.js";
+import { getSetupInstructions } from "./utils/setup.js";
+import { validateConfig } from "./utils/auth.js";
 // Configuration schema - Account ID is required per Orderly Network API requirements
 export const configSchema = z.object({
     WOOFI_API_KEY: z.string().describe("WOOFi API Key"),
@@ -71,10 +73,31 @@ function initializeConfig(mcpConfig) {
         throw error;
     }
 }
+// Simple configuration validation (no circular dependency)
+function validateAuthenticationConfig() {
+    try {
+        console.error("🔐 Validating authentication configuration...");
+        // Use existing validateConfig() from auth.ts - just checks env vars, no API calls
+        validateConfig();
+        console.error("✅ Authentication configuration validated");
+        return true;
+    }
+    catch (error) {
+        console.error("❌ Authentication configuration invalid:", error);
+        console.error("");
+        console.error(getSetupInstructions());
+        return false;
+    }
+}
 async function main() {
     try {
         // Initialize config
         initializeConfig();
+        // Validate authentication configuration
+        const authValid = validateAuthenticationConfig();
+        if (!authValid) {
+            console.error("⚠️  Server starting with limited functionality due to authentication issues");
+        }
         const server = new McpServer({
             name: "woofi-pro",
             version: "1.0.0",
@@ -83,7 +106,7 @@ async function main() {
                 tools: {},
             },
         });
-        console.error("🔧 Registering 19 trading tools...");
+        console.error("🔧 Registering trading tools...");
         // Account tools
         server.tool("get_account_info", "Fetch account balances and fee tiers", {}, async () => {
             const result = await Account.getAccountInfo();
@@ -243,7 +266,7 @@ async function main() {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
         });
-        console.error("✅ All 18 tools registered successfully");
+        console.error("✅ All 18 trading tools registered successfully");
         // Use STDIO transport for Cursor IDE MCP integration
         const transport = new StdioServerTransport();
         await server.connect(transport);

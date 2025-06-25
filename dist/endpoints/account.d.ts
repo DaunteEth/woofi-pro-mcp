@@ -1,5 +1,5 @@
 /**
- * Get account information
+ * Get account information (using key info endpoint)
  */
 export declare function getAccountInfo(): Promise<any>;
 /**

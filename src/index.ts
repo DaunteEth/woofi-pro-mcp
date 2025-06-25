@@ -12,6 +12,9 @@ import * as Positions from "./endpoints/positions.js";
 import * as Liquidations from "./endpoints/liquidations.js";
 import * as Funding from "./endpoints/funding.js";
 import * as WoofiClient from "./endpoints/woofi.js";
+import * as Registration from "./endpoints/registration.js";
+import { getSetupInstructions, hasBasicConfig } from "./utils/setup.js";
+import { validateConfig } from "./utils/auth.js";
 
 // Configuration schema - Account ID is required per Orderly Network API requirements
 export const configSchema = z.object({
@@ -74,10 +77,34 @@ function initializeConfig(mcpConfig?: any) {
   }
 }
 
+// Simple configuration validation (no circular dependency)
+function validateAuthenticationConfig() {
+  try {
+    console.error("🔐 Validating authentication configuration...");
+    
+    // Use existing validateConfig() from auth.ts - just checks env vars, no API calls
+    validateConfig();
+    
+    console.error("✅ Authentication configuration validated");
+    return true;
+  } catch (error) {
+    console.error("❌ Authentication configuration invalid:", error);
+    console.error("");
+    console.error(getSetupInstructions());
+    return false;
+  }
+}
+
 async function main() {
   try {
     // Initialize config
     initializeConfig();
+
+    // Validate authentication configuration
+    const authValid = validateAuthenticationConfig();
+    if (!authValid) {
+      console.error("⚠️  Server starting with limited functionality due to authentication issues");
+    }
 
     const server = new McpServer({
       name: "woofi-pro",
@@ -88,7 +115,7 @@ async function main() {
       },
     });
 
-    console.error("🔧 Registering 19 trading tools...");
+    console.error("🔧 Registering trading tools...");
 
     // Account tools
     server.tool(
@@ -361,7 +388,7 @@ async function main() {
       }
     );
 
-    console.error("✅ All 18 tools registered successfully");
+    console.error("✅ All 18 trading tools registered successfully");
 
     // Use STDIO transport for Cursor IDE MCP integration
     const transport = new StdioServerTransport();
