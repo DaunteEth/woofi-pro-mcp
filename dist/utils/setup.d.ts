@@ -4,16 +4,15 @@
  */
 export declare function getSetupInstructions(): string;
 /**
- * Check if basic configuration is present (uses same logic as auth.ts)
+ * Check if basic configuration is present (updated for new 3-variable approach)
  */
 export declare function hasBasicConfig(): boolean;
 /**
- * Get configuration status aligned with auth.ts requirements
+ * Get configuration status for new simplified approach
  */
 export declare function getConfigStatus(): {
     hasApiKey: boolean;
     hasSecretKey: boolean;
     hasAccountId: boolean;
-    hasEndpoint: boolean;
     isComplete: boolean;
 };

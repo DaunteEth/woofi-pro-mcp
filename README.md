@@ -10,12 +10,8 @@ A **Model Context Protocol (MCP)** server providing **18 comprehensive trading t
 - **18 Trading Tools**: Complete suite for DeFi and derivatives trading
 - **Orderly Network API**: Direct integration with institutional-grade infrastructure  
 - **Universal Compatibility**: Works with Cursor, Claude Desktop, Windsurf, and all MCP clients
-- **One-Command Setup**: Simple NPX command for instant access
-- **Account Management**: Portfolio tracking, PnL analysis, position monitoring
-- **Order Management**: Advanced order types, batch operations
-- **Asset Operations**: Deposits, withdrawals, balance tracking
-- **Position Management**: Real-time position data, liquidation monitoring
-- **Funding & Liquidations**: Funding rate tracking, liquidation analysis
+- **Simple 3-Step Setup**: Just copy .env.example → .env → add credentials
+- **CCXT-Style Security**: API keys ONLY in .env files, never in MCP config
 - **Automatic Authentication**: Seamless ed25519 signature-based auth
 
 ## 🎯 Available Tools
@@ -31,27 +27,29 @@ A **Model Context Protocol (MCP)** server providing **18 comprehensive trading t
 | **Liquidations** | `get_liquidations`, `claim_liquidation` | Liquidation monitoring |
 | **WOOFi** | `create_woofi_order`, `get_woofi_portfolio`, `get_woofi_tokens` | WOOFi Pro integration |
 
-## 🚀 Universal Setup (Works Everywhere!)
+## 🚀 Universal Setup (CCXT-Style)
 
-### One Command - All Platforms
-
-You can use this MCP server on **any MCP-compatible platform** with a single NPX command:
+### 3-Step Setup (Works Everywhere!)
 
 ```bash
-npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro
+# 1. Copy environment template
+cp .env.example .env
+
+# 2. Edit .env with your API credentials
+# (just 3 variables needed!)
+
+# 3. Use simple MCP config (no env vars!)
 ```
 
-**Supported Platforms:**
-- ✅ **Cursor IDE** 
-- ✅ **Claude Desktop**
-- ✅ **Windsurf**
-- ✅ **Any MCP Client**
+**✅ Supported Platforms:**
+- **Cursor IDE** 
+- **Claude Desktop**
+- **Windsurf**
+- **Any MCP Client**
 
-### Platform-Specific Setup
+### Platform-Specific Configuration
 
-#### Cursor IDE
-
-Add to your `.cursor/mcp.json`:
+#### Cursor IDE (`.cursor/mcp.json`)
 
 ```json
 {
@@ -62,15 +60,7 @@ Add to your `.cursor/mcp.json`:
         "-y",
         "git+https://github.com/DaunteEth/execution-agent.git",
         "woofi-pro"
-      ],
-      "env": {
-        "WOOFI_API_KEY": "your_orderly_api_key_here",
-        "WOOFI_SECRET_KEY": "your_orderly_secret_key_here",
-        "WOOFI_BASE_ENDPOINT": "https://api.orderly.org",
-        "WOOFI_ACCOUNT_ID": "your_account_id_here",
-        "WOOFI_CHAIN_ID": "42161",
-        "WOOFI_BROKER_ID": "woofi_pro"
-      }
+      ]
     }
   }
 }
@@ -89,73 +79,59 @@ Add to your `.cursor/mcp.json`:
       "command": "npx",
       "args": [
         "-y",
-        "git+https://github.com/DaunteEth/execution-agent.git",
+        "git+https://github.com/DaunteEh/execution-agent.git",
         "woofi-pro"
-      ],
-      "env": {
-        "WOOFI_API_KEY": "your_orderly_api_key_here",
-        "WOOFI_SECRET_KEY": "your_orderly_secret_key_here",
-        "WOOFI_BASE_ENDPOINT": "https://api.orderly.org",
-        "WOOFI_ACCOUNT_ID": "your_account_id_here",
-        "WOOFI_CHAIN_ID": "42161",
-        "WOOFI_BROKER_ID": "woofi_pro"
-      }
+      ]
     }
   }
 }
 ```
 
-#### Windsurf
+#### Windsurf & Other MCP Clients
 
-Use the same configuration as Claude Desktop in your Windsurf MCP settings.
+Use the same clean configuration - no environment variables needed in config files!
 
-#### Other MCP Clients
+## 🔧 Environment Setup
 
-The command structure is universal. Consult your specific client's documentation for adding MCP servers.
+### 1. Copy Template
+```bash
+cp .env.example .env
+```
 
-## 🔧 Quick Start Guide
+### 2. Get API Credentials
+1. **Visit**: [WOOFi Pro](https://pro.woo.org)
+2. **Complete KYC**: Identity verification
+3. **Generate API Keys**: API Management → Create keys
+4. **Permissions**: Enable `read` and `trading`
 
-### 1. Get Your API Credentials
+### 3. Edit .env File
+```bash
+# Only 3 variables needed!
+WOOFI_API_KEY=your_orderly_api_key_here
+WOOFI_SECRET_KEY=your_orderly_secret_key_here
+WOOFI_ACCOUNT_ID=your_account_id_here
+```
 
-1. **Create WOOFi Pro Account**: Visit [WOOFi Pro](https://pro.woo.org)
-2. **Complete KYC**: Complete identity verification
-3. **Generate API Keys**: Go to API Management and create keys with `read` and `trading` permissions
-4. **Copy Your Details**: Note your API key, secret key, and account ID
+### 🔒 Security: Hardcoded vs Configurable
 
-### 2. Add to Your Platform
+**🔧 Hardcoded (Standard Values):**
+- `WOOFI_BASE_ENDPOINT=https://api.orderly.org` - Never changes
+- `WOOFI_BROKER_ID=woofi_pro` - Our standard broker ID
+- `WOOFI_CHAIN_ID=42161` - Arbitrum network
 
-Choose your platform above and add the configuration with your real API credentials.
-
-### 3. Restart Your Application
-
-Restart your IDE/application to load the MCP server.
-
-### 4. Start Trading!
-
-You can now use natural language to trade:
-- "Show me my account balance"
-- "Place a limit buy order for 0.001 BTC at $90,000"
-- "What are my current positions?"
-
-## 🔧 Environment Variables
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `WOOFI_API_KEY` | Your Orderly API key | `6Nn7hUFANgm2wbvy...` |
-| `WOOFI_SECRET_KEY` | Your Orderly secret key | `5Hd7DLap5XV5qP3t...` |  
-| `WOOFI_BASE_ENDPOINT` | API endpoint | `https://api.orderly.org` |
-| `WOOFI_ACCOUNT_ID` | Your account ID | `0xd8bc14ea4e7ab8c6...` |
-| `WOOFI_CHAIN_ID` | Blockchain ID | `42161` (Arbitrum) |
-| `WOOFI_BROKER_ID` | Broker identifier | `woofi_pro` |
+**🔑 Configurable (User-Specific):**
+- `WOOFI_API_KEY` - Your unique API key
+- `WOOFI_SECRET_KEY` - Your private key  
+- `WOOFI_ACCOUNT_ID` - Your account identifier
 
 ## 💡 Usage Examples
 
 ### Check Account Status
 ```typescript
-// Get account information and active keys
+// Get account information
 await get_account_info({});
 
-// View all positions
+// View all positions  
 await get_all_positions({});
 ```
 
@@ -184,100 +160,51 @@ await create_order({
 // Get all positions
 await get_all_positions({});
 
-// Check specific symbol position
+// Check specific symbol
 await get_position_by_symbol({ symbol: "PERP_BTC_USDC" });
 ```
 
-### Asset Management
-```typescript
-// View asset transaction history
-await get_asset_history({});
+## 🔄 Commands You Can Use
 
-// Create withdrawal request
-await create_withdraw_request({
-  token: "USDC",
-  amount: "100",
-  address: "0x..."
-});
-```
+### Account & Portfolio
+- "Show me my account balance"
+- "What are my current positions?"
+- "Get my asset transaction history"
 
-## 🔍 Troubleshooting
+### Trading
+- "Place a market buy order for 0.001 BTC"
+- "Create a limit sell order for 0.1 ETH at $3500"
+- "Cancel order ID 12345"
+- "Show me my recent orders"
 
-### Common Issues
+### Analysis
+- "What are the current funding rates?"
+- "Check funding rate history for BTC"
+- "Show me liquidation data"
 
-#### "0 tools enabled"
-- ✅ Verify all environment variables are set correctly
-- ✅ Check API key has trading permissions  
-- ✅ Restart your application after configuration changes
-- ✅ Ensure executable name `woofi-pro` is in args array
+## 🛡️ Security Features
 
-#### Authentication errors
-- ✅ Validate API credentials with Orderly Network
-- ✅ Check account verification status on WOOFi Pro
-- ✅ Verify API key expiration date
-- ✅ Ensure broker integration is active
+- **🔒 No API keys in config files** - Following 2025 MCP security best practices
+- **📁 .env files gitignored** - Secrets never committed to version control
+- **🔐 Automatic .env loading** - Server finds .env in working directory
+- **✅ Input validation** - All parameters validated with Zod schemas
+- **🏗️ Hardcoded standards** - Non-sensitive values hardcoded for simplicity
 
-#### Connection issues
-- ✅ Check network connectivity to `https://api.orderly.org`
-- ✅ Verify firewall settings allow HTTPS connections
-- ✅ Test API endpoint accessibility
+## 🤝 Contributing
 
-### Debug Commands
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-```bash
-# Test server directly with NPX
-WOOFI_API_KEY=test WOOFI_SECRET_KEY=test npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro
+## 📄 License
 
-# Check tool availability
-echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}' | WOOFI_API_KEY=test npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Alternative Setup Methods
+## 🔗 Links
 
-If NPX doesn't work, you can also:
-
-1. **Clone and build locally**:
-```bash
-git clone https://github.com/DaunteEh/execution-agent.git
-cd execution-agent
-npm install && npm run build
-node dist/index.js
-```
-
-2. **Use local path in config**:
-```json
-{
-  "command": "node",
-  "args": ["dist/index.js"],
-  "cwd": "/path/to/execution-agent"
-}
-```
-
-## 📚 Documentation & Resources
-
-- **Orderly Network API**: [https://orderly.network/docs/build-on-omnichain/evm-api/introduction](https://orderly.network/docs/build-on-omnichain/evm-api/introduction)
-- **WOOFi Pro**: [https://learn.woo.org/](https://learn.woo.org/)
-- **Model Context Protocol**: [https://modelcontextprotocol.io/](https://modelcontextprotocol.io/)
-- **MCP Best Practices**: Based on [OSP Marketing Tools](https://github.com/open-strategy-partners/osp_marketing_tools) patterns
-
-## ⚖️ License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🚨 Security Notice
-
-- Never commit real API keys to version control
-- Use environment variables for sensitive configuration  
-- Regularly rotate your API keys
-- Monitor your trading activity and API usage
-- The `.cursor/mcp.json` in this repo contains placeholders only
-
-## 🙏 Acknowledgments
-
-- Configuration patterns inspired by [Open Strategy Partners](https://github.com/open-strategy-partners/osp_marketing_tools)
-- Built with [Model Context Protocol](https://modelcontextprotocol.io/)
-- Powered by [Orderly Network](https://orderly.network/)
+- **WOOFi Pro**: [https://pro.woo.org](https://pro.woo.org)
+- **Orderly Network**: [https://orderly.network](https://orderly.network)
+- **Documentation**: [https://orderly.network/docs](https://orderly.network/docs)
+- **GitHub Repository**: [https://github.com/DaunteEth/execution-agent](https://github.com/DaunteEth/execution-agent)
 
 ---
 
-**Ready to trade with AI? Use the universal NPX command and start trading with natural language on any platform! 🚀** 
+⚡ **Ready to trade?** Follow the 3-step setup above and start trading with natural language! 

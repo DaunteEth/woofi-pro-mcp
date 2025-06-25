@@ -5,6 +5,10 @@ import { z } from "zod";
 import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
+// Hardcoded configuration values (non-sensitive, standard values)
+const WOOFI_BASE_ENDPOINT = "https://api.orderly.org";
+const WOOFI_BROKER_ID = "woofi_pro";
+const WOOFI_CHAIN_ID = "42161"; // Arbitrum
 // Load .env file from working directory (like CCXT does)
 const envPath = path.resolve(process.cwd(), '.env');
 const envExamplePath = path.resolve(process.cwd(), '.env.example');
@@ -25,14 +29,11 @@ import * as Funding from "./endpoints/funding.js";
 import * as WoofiClient from "./endpoints/woofi.js";
 import { getSetupInstructions } from "./utils/setup.js";
 import { validateConfig } from "./utils/auth.js";
-// Configuration schema - Account ID is required per Orderly Network API requirements
+// Simplified configuration schema - only user-specific values
 export const configSchema = z.object({
     WOOFI_API_KEY: z.string().describe("WOOFi API Key"),
     WOOFI_SECRET_KEY: z.string().describe("WOOFi Secret Key"),
-    WOOFI_BASE_ENDPOINT: z.string().describe("WOOFi Base Endpoint"),
     WOOFI_ACCOUNT_ID: z.string().optional().describe("WOOFi Account ID"),
-    WOOFI_CHAIN_ID: z.string().optional().describe("WOOFi Chain ID"),
-    WOOFI_BROKER_ID: z.string().optional().describe("WOOFi Broker ID"),
 });
 // Global configuration storage
 let globalConfig;
@@ -54,10 +55,7 @@ function checkEnvSetup() {
             console.error("💡 Create .env file with:");
             console.error("   WOOFI_API_KEY=your_api_key");
             console.error("   WOOFI_SECRET_KEY=your_secret_key");
-            console.error("   WOOFI_BASE_ENDPOINT=https://api.orderly.org");
             console.error("   WOOFI_ACCOUNT_ID=your_account_id");
-            console.error("   WOOFI_CHAIN_ID=42161");
-            console.error("   WOOFI_BROKER_ID=woofi_pro");
         }
         console.error("");
         console.error("🔒 Security: API keys should ONLY be in .env files, never in MCP config!");
@@ -66,7 +64,7 @@ function checkEnvSetup() {
     }
     return true;
 }
-// Initialize configuration - prioritize environment variables for security
+// Initialize configuration - only user-specific values from env
 function initializeConfig() {
     try {
         // Check for .env file setup
@@ -75,10 +73,7 @@ function initializeConfig() {
         const envConfig = {
             WOOFI_API_KEY: process.env.WOOFI_API_KEY,
             WOOFI_SECRET_KEY: process.env.WOOFI_SECRET_KEY,
-            WOOFI_BASE_ENDPOINT: process.env.WOOFI_BASE_ENDPOINT || "https://api.orderly.org",
             WOOFI_ACCOUNT_ID: process.env.WOOFI_ACCOUNT_ID,
-            WOOFI_CHAIN_ID: process.env.WOOFI_CHAIN_ID || "42161",
-            WOOFI_BROKER_ID: process.env.WOOFI_BROKER_ID || "woofi_pro",
         };
         // Validate required environment variables
         if (!envConfig.WOOFI_API_KEY || !envConfig.WOOFI_SECRET_KEY) {
@@ -91,17 +86,16 @@ function initializeConfig() {
         }
         console.error("✅ Using environment variables from .env file");
         globalConfig = configSchema.parse(envConfig);
-        // Set global environment variables for endpoint modules
+        // Set global environment variables for endpoint modules (including hardcoded values)
         process.env.WOOFI_API_KEY = globalConfig.WOOFI_API_KEY;
         process.env.WOOFI_SECRET_KEY = globalConfig.WOOFI_SECRET_KEY;
-        process.env.WOOFI_BASE_ENDPOINT = globalConfig.WOOFI_BASE_ENDPOINT;
+        process.env.WOOFI_BASE_ENDPOINT = WOOFI_BASE_ENDPOINT;
+        process.env.WOOFI_CHAIN_ID = WOOFI_CHAIN_ID;
+        process.env.WOOFI_BROKER_ID = WOOFI_BROKER_ID;
         if (globalConfig.WOOFI_ACCOUNT_ID)
             process.env.WOOFI_ACCOUNT_ID = globalConfig.WOOFI_ACCOUNT_ID;
-        if (globalConfig.WOOFI_CHAIN_ID)
-            process.env.WOOFI_CHAIN_ID = globalConfig.WOOFI_CHAIN_ID;
-        if (globalConfig.WOOFI_BROKER_ID)
-            process.env.WOOFI_BROKER_ID = globalConfig.WOOFI_BROKER_ID;
-        console.error(`✅ Configuration initialized - Endpoint: ${globalConfig.WOOFI_BASE_ENDPOINT}`);
+        console.error(`✅ Configuration initialized - Endpoint: ${WOOFI_BASE_ENDPOINT}`);
+        console.error(`🔧 Using hardcoded values: Broker=${WOOFI_BROKER_ID}, Chain=${WOOFI_CHAIN_ID}`);
     }
     catch (error) {
         console.error("❌ Configuration error:", error);
