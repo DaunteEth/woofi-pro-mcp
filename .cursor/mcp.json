@@ -36,11 +36,9 @@
             ]
         },
         "woofi-pro": {
-            "command": "npx",
+            "command": "node",
             "args": [
-                "-y", 
-                "git+https://github.com/DaunteEth/execution-agent.git",
-                "woofi-pro"
+                "/Users/daunteharris/Desktop/woo-product-development/ai-agents/mcps/woofi-pro-mcp/dist/index.js"
             ],
             "env": {
                 "WOOFI_API_KEY": "6Nn7hUFANgm2wbvy3A43ckuqFKqDCeggnae3219T7Yyq",
