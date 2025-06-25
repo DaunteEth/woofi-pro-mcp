@@ -41,7 +41,7 @@
                 "/Users/daunteharris/Desktop/woo-product-development/ai-agents/mcps/woofi-pro-mcp/dist/index.js"
             ],
             "env": {
-                "WOOFI_API_KEY": "6Nn7hUFANgm2wbvy3A43ckuqFKqDCeggnae3219T7Yyq",
+                "WOOFI_API_KEY": "ed25519:6Nn7hUFANgm2wbvy3A43ckuqFKqDCeggnae3219T7Yyq",
                 "WOOFI_SECRET_KEY": "5Hd7DLap5XV5qP3tkTYKwrbkiB1mzc2v9gk5U1K52FDq",
                 "WOOFI_BASE_ENDPOINT": "https://api.orderly.org",
                 "WOOFI_ACCOUNT_ID": "0xd8bc14ea4e7ab8c6ce4e832b1b7ee03f982295002312904d56b169ffb560f3db",
