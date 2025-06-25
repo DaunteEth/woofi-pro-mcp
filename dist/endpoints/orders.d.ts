@@ -299,11 +299,11 @@ export declare function editAlgoOrder(params: z.infer<typeof editAlgoOrderSchema
 /**
  * Cancel an algo order by order ID
  */
-export declare function cancelAlgoOrder(orderId: string): Promise<any>;
+export declare function cancelAlgoOrder(orderId: string, symbol: string): Promise<any>;
 /**
  * Cancel an algo order by client order ID
  */
-export declare function cancelAlgoOrderByClientId(clientOrderId: string): Promise<any>;
+export declare function cancelAlgoOrderByClientId(clientOrderId: string, symbol: string): Promise<any>;
 /**
  * Cancel all pending algo orders
  */

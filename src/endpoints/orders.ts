@@ -337,17 +337,18 @@ export async function editAlgoOrder(params: z.infer<typeof editAlgoOrderSchema>)
 /**
  * Cancel an algo order by order ID
  */
-export async function cancelAlgoOrder(orderId: string) {
+export async function cancelAlgoOrder(orderId: string, symbol: string) {
   validateConfig();
   
-  if (!orderId) {
-    throw new Error('Order ID is required');
+  if (!orderId || !symbol) {
+    throw new Error('Order ID and symbol are required');
   }
   
-  console.log(`🚫 Cancelling algo order: ${orderId}`);
+  console.log(`🚫 Cancelling algo order: ${orderId} for symbol: ${symbol}`);
   
   try {
-    const result = await signAndSendRequest('DELETE', `/v1/algo/order/${orderId}`);
+    const endpoint = `/v1/algo/order?order_id=${encodeURIComponent(orderId)}&symbol=${encodeURIComponent(symbol)}`;
+    const result = await signAndSendRequest('DELETE', endpoint);
     console.log('✅ Algo order cancelled successfully:', result);
     return result;
   } catch (error) {
@@ -359,17 +360,18 @@ export async function cancelAlgoOrder(orderId: string) {
 /**
  * Cancel an algo order by client order ID
  */
-export async function cancelAlgoOrderByClientId(clientOrderId: string) {
+export async function cancelAlgoOrderByClientId(clientOrderId: string, symbol: string) {
   validateConfig();
   
-  if (!clientOrderId) {
-    throw new Error('Client Order ID is required');
+  if (!clientOrderId || !symbol) {
+    throw new Error('Client Order ID and symbol are required');
   }
   
-  console.log(`🚫 Cancelling algo order by client ID: ${clientOrderId}`);
+  console.log(`🚫 Cancelling algo order by client ID: ${clientOrderId} for symbol: ${symbol}`);
   
   try {
-    const result = await signAndSendRequest('DELETE', `/v1/algo/client/order/${clientOrderId}`);
+    const endpoint = `/v1/algo/client/order?client_order_id=${encodeURIComponent(clientOrderId)}&symbol=${encodeURIComponent(symbol)}`;
+    const result = await signAndSendRequest('DELETE', endpoint);
     console.log('✅ Algo order cancelled successfully:', result);
     return result;
   } catch (error) {

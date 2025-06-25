@@ -352,14 +352,16 @@ async function main() {
         });
         server.tool("cancel_algo_order", "Cancel an algo order by order ID", {
             order_id: z.string().describe("Algo order ID to cancel"),
-        }, async ({ order_id }) => {
-            const result = await Orders.cancelAlgoOrder(order_id);
+            symbol: z.string().describe("Trading symbol for the algo order"),
+        }, async ({ order_id, symbol }) => {
+            const result = await Orders.cancelAlgoOrder(order_id, symbol);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
         });
         server.tool("cancel_algo_order_by_client_id", "Cancel an algo order by client order ID", {
             client_order_id: z.string().describe("Client order ID to cancel"),
-        }, async ({ client_order_id }) => {
-            const result = await Orders.cancelAlgoOrderByClientId(client_order_id);
+            symbol: z.string().describe("Trading symbol for the algo order"),
+        }, async ({ client_order_id, symbol }) => {
+            const result = await Orders.cancelAlgoOrderByClientId(client_order_id, symbol);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
         });
         server.tool("cancel_all_pending_algo_orders", "Cancel all pending algo orders", {
@@ -412,8 +414,60 @@ async function main() {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
         });
-        server.tool("settle_pnl", "Settle PnL", {}, async () => {
-            const result = await Assets.settlePnl();
+        server.tool("get_settle_pnl_nonce", "Get settle PnL nonce", {}, async () => {
+            const result = await Assets.getSettlePnlNonce();
+            return {
+                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+            };
+        });
+        server.tool("request_pnl_settlement", "Request PnL settlement with EIP-712 signature", {
+            signature: z.string().describe("EIP-712 signature"),
+            userAddress: z.string().describe("User address"),
+            verifyingContract: z.string().describe("Verifying contract address"),
+            message: z.object({
+                brokerId: z.string(),
+                chainId: z.number(),
+                chainType: z.string(),
+                settleNonce: z.number(),
+                timestamp: z.number(),
+            }).describe("Message object for EIP-712 signature"),
+        }, async (params) => {
+            const result = await Assets.requestPnlSettlement(params);
+            return {
+                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+            };
+        });
+        server.tool("get_pnl_settlement_history", "Get PnL settlement history", {
+            symbol: z.string().optional().describe("Optional symbol filter"),
+            start_t: z.string().optional().describe("Start timestamp"),
+            end_t: z.string().optional().describe("End timestamp"),
+            page: z.string().optional().describe("Page number"),
+            size: z.string().optional().describe("Page size"),
+        }, async (params) => {
+            const result = await Assets.getPnlSettlementHistory(params);
+            return {
+                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+            };
+        });
+        server.tool("create_internal_transfer", "Create internal transfer between accounts", {
+            token: z.string().describe("Token symbol"),
+            amount: z.string().describe("Amount to transfer"),
+            fromAccountId: z.string().describe("Source account ID"),
+            toAccountId: z.string().describe("Destination account ID"),
+        }, async (params) => {
+            const result = await Assets.createInternalTransfer(params);
+            return {
+                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+            };
+        });
+        server.tool("get_internal_transfer_history", "Get internal transfer history", {
+            symbol: z.string().optional().describe("Optional symbol filter"),
+            start_t: z.string().optional().describe("Start timestamp"),
+            end_t: z.string().optional().describe("End timestamp"),
+            page: z.string().optional().describe("Page number"),
+            size: z.string().optional().describe("Page size"),
+        }, async (params) => {
+            const result = await Assets.getInternalTransferHistory(params);
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
@@ -448,37 +502,69 @@ async function main() {
             };
         });
         // Liquidation tools
-        server.tool("get_liquidations", "Get liquidation data", {}, async () => {
-            const result = await Liquidations.getLiquidations();
+        server.tool("get_liquidated_positions", "Get public liquidated positions", {
+            symbol: z.string().optional().describe("Optional symbol filter"),
+            start_t: z.number().optional().describe("Start timestamp"),
+            end_t: z.number().optional().describe("End timestamp"),
+            page: z.number().optional().describe("Page number"),
+            size: z.number().optional().describe("Page size"),
+        }, async (params) => {
+            const result = await Liquidations.getLiquidatedPositions(params);
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
         });
-        server.tool("claim_liquidation", "Claim liquidation", {
-            liquidation_id: z.string().describe("Liquidation ID to claim"),
+        server.tool("get_liquidations", "Get user liquidation data", {
+            symbol: z.string().optional().describe("Optional symbol filter"),
+            start_t: z.number().optional().describe("Start timestamp"),
+            end_t: z.number().optional().describe("End timestamp"),
+            page: z.number().optional().describe("Page number"),
+            size: z.number().optional().describe("Page size"),
         }, async (params) => {
-            const result = await Liquidations.claimLiquidation(params);
+            const result = await Liquidations.getLiquidations(params);
+            return {
+                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+            };
+        });
+        server.tool("get_liquidation_history", "Get liquidation history", {
+            symbol: z.string().optional().describe("Optional symbol filter"),
+            start_t: z.number().optional().describe("Start timestamp"),
+            end_t: z.number().optional().describe("End timestamp"),
+            page: z.number().optional().describe("Page number"),
+            size: z.number().optional().describe("Page size"),
+        }, async (params) => {
+            const result = await Liquidations.getLiquidationHistory(params);
+            return {
+                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+            };
+        });
+        server.tool("get_liquidation_by_id", "Get liquidation details by ID", {
+            liquidation_id: z.string().describe("Liquidation ID"),
+        }, async ({ liquidation_id }) => {
+            const result = await Liquidations.getLiquidationById(liquidation_id);
+            return {
+                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+            };
+        });
+        server.tool("get_liquidation_orders", "Get liquidation orders", {
+            symbol: z.string().optional().describe("Optional symbol filter"),
+            start_t: z.number().optional().describe("Start timestamp"),
+            end_t: z.number().optional().describe("End timestamp"),
+            page: z.number().optional().describe("Page number"),
+            size: z.number().optional().describe("Page size"),
+        }, async (params) => {
+            const result = await Liquidations.getLiquidationOrders(params);
+            return {
+                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+            };
+        });
+        server.tool("get_insurance_fund", "Get insurance fund details", {}, async () => {
+            const result = await Liquidations.getInsuranceFund();
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
         });
         // Funding tools
-        server.tool("get_funding_rates", "Get funding rates for symbols", {
-            symbol: z.string().optional().describe("Optional symbol to filter funding rates"),
-        }, async ({ symbol }) => {
-            const result = await Funding.getFundingRates(symbol);
-            return {
-                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-            };
-        });
-        server.tool("get_funding_rate_history", "Get funding rate history", {
-            symbol: z.string().describe("Symbol to get funding history for"),
-        }, async ({ symbol }) => {
-            const result = await Funding.getFundingRateHistory(symbol);
-            return {
-                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-            };
-        });
         server.tool("get_funding_fee_history", "Get funding fee history", {
             symbol: z.string().optional().describe("Optional symbol to filter"),
             start_t: z.string().optional().describe("Start timestamp"),
@@ -502,11 +588,11 @@ async function main() {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
         });
-        console.error("✅ All 29 trading tools registered successfully");
+        console.error("✅ All 40 trading tools registered successfully");
         // Use STDIO transport for Cursor IDE MCP integration
         const transport = new StdioServerTransport();
         await server.connect(transport);
-        console.error("🟢 WOOFi Pro MCP Server running locally via STDIO with 29 tools enabled");
+        console.error("🟢 WOOFi Pro MCP Server running locally via STDIO with 40 tools enabled");
     }
     catch (error) {
         console.error("❌ Server error:", error);
