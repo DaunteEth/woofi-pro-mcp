@@ -36,18 +36,13 @@
             ]
         },
         "woofi-pro": {
-            "command": "node",
-            "args": [
-                "/Users/daunteharris/Desktop/woo-product-development/ai-agents/mcps/woofi-pro-mcp/dist/index.js"
-            ],
-            "env": {
-                "WOOFI_SECRET_KEY": "5Hd7DLap5XV5qP3tkTYKwrbkiB1mzc2v9gk5U1K52FDq",
-                "WOOFI_BASE_ENDPOINT": "https://api.orderly.org",
-                "WOOFI_ACCOUNT_ID": "0xd8bc14ea4e7ab8c6ce4e832b1b7ee03f982295002312904d56b169ffb560f3db",
-                "WOOFI_CHAIN_ID": "42161",
-                "WOOFI_BROKER_ID": "woofi_pro"
-            }
-        }
+      "command": "npx",
+      "args": [
+        "-y",
+        "git+https://github.com/DaunteEth/execution-agent.git",
+        "woofi-pro"
+      ]
+    }
         
     }
 }

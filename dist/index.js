@@ -2,6 +2,19 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
+// Load .env file from working directory (like CCXT does)
+const envPath = path.resolve(process.cwd(), '.env');
+const envExamplePath = path.resolve(process.cwd(), '.env.example');
+try {
+    dotenv.config({ path: envPath });
+    console.error(`🔧 Loading environment from: ${envPath}`);
+}
+catch (error) {
+    console.error(`⚠️  Could not load .env from: ${envPath}`);
+}
 // Import endpoint modules
 import * as Account from "./endpoints/account.js";
 import * as Orders from "./endpoints/orders.js";
@@ -23,39 +36,61 @@ export const configSchema = z.object({
 });
 // Global configuration storage
 let globalConfig;
-// Initialize configuration - prioritize environment variables for local development
-function initializeConfig(mcpConfig) {
+// Check if .env file exists and provide helpful setup instructions
+function checkEnvSetup() {
+    const hasEnv = fs.existsSync(envPath);
+    const hasEnvExample = fs.existsSync(envExamplePath);
+    if (!hasEnv) {
+        console.error("");
+        console.error("🚨 No .env file found!");
+        console.error(`📂 Looking for: ${envPath}`);
+        console.error("");
+        if (hasEnvExample) {
+            console.error("💡 Quick setup:");
+            console.error(`   cp .env.example .env`);
+            console.error(`   # Edit .env with your API credentials`);
+        }
+        else {
+            console.error("💡 Create .env file with:");
+            console.error("   WOOFI_API_KEY=your_api_key");
+            console.error("   WOOFI_SECRET_KEY=your_secret_key");
+            console.error("   WOOFI_BASE_ENDPOINT=https://api.orderly.org");
+            console.error("   WOOFI_ACCOUNT_ID=your_account_id");
+            console.error("   WOOFI_CHAIN_ID=42161");
+            console.error("   WOOFI_BROKER_ID=woofi_pro");
+        }
+        console.error("");
+        console.error("🔒 Security: API keys should ONLY be in .env files, never in MCP config!");
+        console.error("");
+        return false;
+    }
+    return true;
+}
+// Initialize configuration - prioritize environment variables for security
+function initializeConfig() {
     try {
-        // Try to use environment variables first (for local dev)
+        // Check for .env file setup
+        const hasValidEnv = checkEnvSetup();
+        // Load from environment variables (loaded by dotenv)
         const envConfig = {
             WOOFI_API_KEY: process.env.WOOFI_API_KEY,
             WOOFI_SECRET_KEY: process.env.WOOFI_SECRET_KEY,
-            WOOFI_BASE_ENDPOINT: process.env.WOOFI_BASE_ENDPOINT,
+            WOOFI_BASE_ENDPOINT: process.env.WOOFI_BASE_ENDPOINT || "https://api.orderly.org",
             WOOFI_ACCOUNT_ID: process.env.WOOFI_ACCOUNT_ID,
-            WOOFI_CHAIN_ID: process.env.WOOFI_CHAIN_ID,
-            WOOFI_BROKER_ID: process.env.WOOFI_BROKER_ID,
+            WOOFI_CHAIN_ID: process.env.WOOFI_CHAIN_ID || "42161",
+            WOOFI_BROKER_ID: process.env.WOOFI_BROKER_ID || "woofi_pro",
         };
-        // Check if we have required env vars
-        if (envConfig.WOOFI_API_KEY && envConfig.WOOFI_SECRET_KEY && envConfig.WOOFI_BASE_ENDPOINT) {
-            console.error("🔧 Using environment variables");
-            globalConfig = configSchema.parse(envConfig);
+        // Validate required environment variables
+        if (!envConfig.WOOFI_API_KEY || !envConfig.WOOFI_SECRET_KEY) {
+            console.error("❌ Missing required environment variables!");
+            console.error("   Required: WOOFI_API_KEY, WOOFI_SECRET_KEY");
+            if (hasValidEnv) {
+                console.error("   Check your .env file has these values set");
+            }
+            throw new Error("Missing required API credentials");
         }
-        else if (mcpConfig) {
-            console.error("🔧 Using MCP configuration");
-            globalConfig = configSchema.parse(mcpConfig);
-        }
-        else {
-            // Use default/fallback values for testing
-            console.error("🔧 Using default configuration - some features may not work");
-            globalConfig = {
-                WOOFI_API_KEY: "test_api_key",
-                WOOFI_SECRET_KEY: "test_secret_key",
-                WOOFI_BASE_ENDPOINT: "https://api.orderly.org",
-                WOOFI_ACCOUNT_ID: "test_account_id",
-                WOOFI_CHAIN_ID: "42161",
-                WOOFI_BROKER_ID: "woofi_pro",
-            };
-        }
+        console.error("✅ Using environment variables from .env file");
+        globalConfig = configSchema.parse(envConfig);
         // Set global environment variables for endpoint modules
         process.env.WOOFI_API_KEY = globalConfig.WOOFI_API_KEY;
         process.env.WOOFI_SECRET_KEY = globalConfig.WOOFI_SECRET_KEY;
@@ -70,6 +105,10 @@ function initializeConfig(mcpConfig) {
     }
     catch (error) {
         console.error("❌ Configuration error:", error);
+        console.error("");
+        console.error("📖 For detailed setup instructions, visit:");
+        console.error("   https://github.com/DaunteEth/execution-agent#setup");
+        console.error("");
         throw error;
     }
 }

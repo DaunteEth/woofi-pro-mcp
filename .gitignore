@@ -1,8 +1,37 @@
 # Dependencies
 node_modules/
 
-# Smithery artifacts (no longer used)
+# Environment variables (sensitive)
+.env
+.env.local
+.env.production
+.env.development
+config.env
+
+# Build artifacts
+dist/
+*.tsbuildinfo
+woofi-pro-mcp
+
+# Development files
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# IDE and OS files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Test files (if moved to root)
+test-*.js
+
+# Temporary files
+tmp/
+temp/
+
+# Legacy artifacts (no longer used)
 .smithery/
 smithery.yaml
 plugin-manifest.json
-.env
