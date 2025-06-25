@@ -29,19 +29,19 @@ export async function getAssetHistory() {
 }
 
 /**
- * Get asset holdings
+ * Get current holdings
  */
 export async function getHoldings() {
   validateConfig();
   
-  console.log('📋 Getting asset holdings...');
+  console.log('📋 Getting current holdings...');
   
   try {
-    const result = await signAndSendRequest('GET', '/v1/asset/holding');
-    console.log('✅ Asset holdings retrieved successfully:', result);
+    const result = await signAndSendRequest('GET', '/v1/client/holding');
+    console.log('✅ Current holdings retrieved successfully:', result);
     return result;
   } catch (error) {
-    console.error('❌ Failed to get asset holdings:', error);
+    console.error('❌ Failed to get current holdings:', error);
     throw error;
   }
 }

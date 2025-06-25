@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import { signAndSendRequest, getBaseUrl, validateConfig } from '../utils/auth.js';
 
+// Zod schema for position history query parameters
+const positionHistoryQuerySchema = z.object({
+  symbol: z.string().optional(),
+  limit: z.number().optional(),
+});
+
 /**
  * Get all positions
  */
@@ -42,19 +48,34 @@ export async function getPositionBySymbol(symbol: string) {
 }
 
 /**
- * Get aggregated positions
+ * Get position history
  */
-export async function getAggregatedPositions() {
+export async function getPositionHistory(params?: z.infer<typeof positionHistoryQuerySchema>) {
   validateConfig();
   
-  console.log('📋 Getting aggregated positions...');
+  // Validate and prepare query parameters
+  const validatedParams = params ? positionHistoryQuerySchema.parse(params) : {};
+  
+  // Build query string
+  const queryParams = new URLSearchParams();
+  Object.entries(validatedParams).forEach(([key, value]) => {
+    if (value !== undefined) {
+      queryParams.append(key, value.toString());
+    }
+  });
+
+  const endpoint = queryParams.toString() 
+    ? `/v1/position_history?${queryParams.toString()}`
+    : '/v1/position_history';
+  
+  console.log(`📋 Getting position history with params:`, validatedParams);
   
   try {
-    const result = await signAndSendRequest('GET', '/v1/positions/aggregate');
-    console.log('✅ Aggregated positions retrieved successfully:', result);
+    const result = await signAndSendRequest('GET', endpoint);
+    console.log('✅ Position history retrieved successfully:', result);
     return result;
   } catch (error) {
-    console.error('❌ Failed to get aggregated positions:', error);
+    console.error('❌ Failed to get position history:', error);
     throw error;
   }
 } 

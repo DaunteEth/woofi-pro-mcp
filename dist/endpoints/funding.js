@@ -1,12 +1,21 @@
+import { z } from 'zod';
 import { signAndSendRequest, validateConfig } from '../utils/auth.js';
+// Zod schema for funding fee history query parameters
+const fundingFeeHistoryQuerySchema = z.object({
+    symbol: z.string().optional(),
+    start_t: z.string().optional(),
+    end_t: z.string().optional(),
+    page: z.string().optional(),
+    size: z.string().optional(),
+});
 /**
  * Get funding rates for symbols
  */
 export async function getFundingRates(symbol) {
     validateConfig();
     const endpoint = symbol
-        ? `/v1/funding_rates?symbol=${encodeURIComponent(symbol)}`
-        : '/v1/funding_rates';
+        ? `/v1/public/funding_rate_history/${encodeURIComponent(symbol)}`
+        : '/v1/public/funding_rates';
     console.log(`📋 Getting funding rates${symbol ? ` for ${symbol}` : ''}...`);
     try {
         const result = await signAndSendRequest('GET', endpoint);
@@ -26,9 +35,9 @@ export async function getFundingRateHistory(symbol) {
     if (!symbol) {
         throw new Error('Symbol is required');
     }
-    console.log(`📋 Getting funding rate history for: ${symbol}`);
+    console.log(`📋 Getting funding rate history for ${symbol}...`);
     try {
-        const result = await signAndSendRequest('GET', `/v1/funding_rate_history?symbol=${encodeURIComponent(symbol)}`);
+        const result = await signAndSendRequest('GET', `/v1/public/funding_rate_history/${encodeURIComponent(symbol)}`);
         console.log('✅ Funding rate history retrieved successfully:', result);
         return result;
     }
@@ -40,12 +49,21 @@ export async function getFundingRateHistory(symbol) {
 /**
  * Get funding fee history
  */
-export async function getFundingFeeHistory(symbol) {
+export async function getFundingFeeHistory(params) {
     validateConfig();
-    const endpoint = symbol
-        ? `/v1/funding_fee/history?symbol=${encodeURIComponent(symbol)}`
+    // Validate and prepare query parameters
+    const validatedParams = params ? fundingFeeHistoryQuerySchema.parse(params) : {};
+    // Build query string
+    const queryParams = new URLSearchParams();
+    Object.entries(validatedParams).forEach(([key, value]) => {
+        if (value !== undefined) {
+            queryParams.append(key, value.toString());
+        }
+    });
+    const endpoint = queryParams.toString()
+        ? `/v1/funding_fee/history?${queryParams.toString()}`
         : '/v1/funding_fee/history';
-    console.log(`📋 Getting funding fee history${symbol ? ` for ${symbol}` : ''}...`);
+    console.log(`📋 Getting funding fee history with params:`, validatedParams);
     try {
         const result = await signAndSendRequest('GET', endpoint);
         console.log('✅ Funding fee history retrieved successfully:', result);

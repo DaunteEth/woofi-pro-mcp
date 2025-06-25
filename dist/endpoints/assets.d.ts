@@ -23,7 +23,7 @@ declare const withdrawRequestSchema: z.ZodObject<{
  */
 export declare function getAssetHistory(): Promise<any>;
 /**
- * Get asset holdings
+ * Get current holdings
  */
 export declare function getHoldings(): Promise<any>;
 /**

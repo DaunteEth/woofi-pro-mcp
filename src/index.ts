@@ -32,7 +32,6 @@ import * as Assets from "./endpoints/assets.js";
 import * as Positions from "./endpoints/positions.js";
 import * as Liquidations from "./endpoints/liquidations.js";
 import * as Funding from "./endpoints/funding.js";
-import * as WoofiClient from "./endpoints/woofi.js";
 import { getSetupInstructions } from "./utils/setup.js";
 import { validateConfig } from "./utils/auth.js";
 
@@ -267,69 +266,278 @@ async function main() {
     );
 
     // Order tools
+    // === REGULAR ORDER MANAGEMENT TOOLS (10 tools) ===
+    
     server.tool(
       "create_order",
-      "Place a spot/perp order on Orderly",
+      "Create a new regular order",
       {
         symbol: z.string().describe("Trading symbol (e.g., PERP_ETH_USDC)"),
-        order_type: z.string().describe("LIMIT/MARKET/IOC/FOK/POST_ONLY/ASK/BID"),
-        side: z.string().describe("SELL/BUY"),
-        order_quantity: z.number().describe("Order quantity"),
+        side: z.enum(["BUY", "SELL"]).describe("Order side"),
+        order_type: z.enum(["LIMIT", "MARKET", "IOC", "FOK", "POST_ONLY", "ASK", "BID"]).describe("Order type"),
         order_price: z.number().optional().describe("Order price (required for LIMIT orders)"),
-        client_order_id: z.string().optional().describe("Client order ID"),
+        order_quantity: z.number().optional().describe("Order quantity"),
+        order_amount: z.number().optional().describe("Order amount in quote currency"),
+        client_order_id: z.string().optional().describe("Custom order ID (max 36 chars)"),
+        visible_quantity: z.number().optional().describe("Visible quantity on orderbook"),
+        reduce_only: z.boolean().optional().describe("Reduce only flag"),
+        slippage: z.number().optional().describe("Slippage tolerance for MARKET orders"),
+        order_tag: z.string().optional().describe("Order tag"),
+        level: z.number().optional().describe("Price level for ASK/BID orders"),
+        post_only_adjust: z.boolean().optional().describe("Adjust price for POST_ONLY orders"),
       },
       async (params) => {
-        const result = await Orders.createOrder(params as any);
-        return {
-          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-        };
+        const result = await Orders.createOrder(params);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       }
     );
 
     server.tool(
       "batch_create_orders",
-      "Batch-create up to 10 orders",
+      "Create multiple orders in batch",
       {
-        orders: z.array(z.any()).describe("Array of order objects"),
+        orders: z.array(z.object({
+          symbol: z.string().describe("Trading symbol"),
+          side: z.enum(["BUY", "SELL"]).describe("Order side"),
+          order_type: z.enum(["LIMIT", "MARKET", "IOC", "FOK", "POST_ONLY", "ASK", "BID"]).describe("Order type"),
+          order_price: z.number().optional().describe("Order price"),
+          order_quantity: z.number().optional().describe("Order quantity"),
+          order_amount: z.number().optional().describe("Order amount"),
+          client_order_id: z.string().optional().describe("Client order ID"),
+          visible_quantity: z.number().optional().describe("Visible quantity"),
+          reduce_only: z.boolean().optional().describe("Reduce only flag"),
+          slippage: z.number().optional().describe("Slippage tolerance"),
+          order_tag: z.string().optional().describe("Order tag"),
+          level: z.number().optional().describe("Price level"),
+          post_only_adjust: z.boolean().optional().describe("Post only adjust"),
+        })).describe("Array of orders to create"),
       },
       async ({ orders }) => {
-        const result = await Orders.batchCreateOrders({ orders: orders as any });
-        return {
-          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-        };
+        const result = await Orders.batchCreateOrders({ orders });
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "edit_order",
+      "Edit an existing order",
+      {
+        order_id: z.string().describe("Order ID to edit"),
+        order_quantity: z.number().optional().describe("New order quantity"),
+        order_price: z.number().optional().describe("New order price"),
+      },
+      async (params) => {
+        const result = await Orders.editOrder(params);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       }
     );
 
     server.tool(
       "cancel_order",
-      "Cancel an existing order",
+      "Cancel an order by order ID",
       {
         order_id: z.string().describe("Order ID to cancel"),
-        symbol: z.string().describe("Trading symbol"),
       },
       async ({ order_id }) => {
         const result = await Orders.cancelOrder(order_id);
-        return {
-          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-        };
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "cancel_order_by_client_id",
+      "Cancel an order by client order ID",
+      {
+        client_order_id: z.string().describe("Client order ID to cancel"),
+      },
+      async ({ client_order_id }) => {
+        const result = await Orders.cancelOrderByClientId(client_order_id);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "cancel_all_pending_orders",
+      "Cancel all pending orders",
+      {
+        symbol: z.string().optional().describe("Symbol to cancel orders for (optional)"),
+      },
+      async ({ symbol }) => {
+        const result = await Orders.cancelAllPendingOrders(symbol);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "cancel_all_after",
+      "Cancel all orders after a timeout",
+      {
+        timeout: z.number().describe("Timeout in milliseconds"),
+      },
+      async (params) => {
+        const result = await Orders.cancelAllAfter(params);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       }
     );
 
     server.tool(
       "get_orders",
-      "Get order history",
+      "Get orders with filtering options",
       {
-        symbol: z.string().optional().describe("Optional symbol to filter"),
-        status: z.string().optional().describe("Optional status to filter"),
+        symbol: z.string().optional().describe("Filter by symbol"),
+        status: z.enum(["NEW", "PARTIALLY_FILLED", "FILLED", "CANCELLED", "REJECTED", "INCOMPLETE", "COMPLETED"]).optional().describe("Filter by status"),
+        tag: z.string().optional().describe("Filter by tag"),
+        order_type: z.enum(["LIMIT", "MARKET", "IOC", "FOK", "POST_ONLY", "ASK", "BID"]).optional().describe("Filter by order type"),
+        order_tag: z.string().optional().describe("Filter by order tag"),
+        side: z.enum(["BUY", "SELL"]).optional().describe("Filter by side"),
+        start_t: z.number().optional().describe("Start time filter"),
+        end_t: z.number().optional().describe("End time filter"),
+        size: z.number().optional().describe("Page size"),
+        page: z.number().optional().describe("Page number"),
       },
-      async ({ symbol, status }) => {
-        const params: any = {};
-        if (symbol) params.symbol = symbol;
-        if (status) params.status = status;
+      async (params) => {
         const result = await Orders.getOrders(params);
-        return {
-          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-        };
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "get_order_by_id",
+      "Get order by order ID",
+      {
+        order_id: z.string().describe("Order ID to retrieve"),
+      },
+      async ({ order_id }) => {
+        const result = await Orders.getOrderById(order_id);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "get_order_by_client_id",
+      "Get order by client order ID",
+      {
+        client_order_id: z.string().describe("Client order ID to retrieve"),
+      },
+      async ({ client_order_id }) => {
+        const result = await Orders.getOrderByClientId(client_order_id);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    // === ALGO ORDER MANAGEMENT TOOLS (8 tools) ===
+    
+    server.tool(
+      "create_algo_order",
+      "Create an algorithmic order (stop loss, take profit, etc.)",
+      {
+        symbol: z.string().describe("Trading symbol"),
+        algo_type: z.enum(["STOP", "TP_SL", "POSITIONAL_TP_SL", "BRACKET", "TAKE_PROFIT", "STOP_LOSS"]).describe("Algorithm order type"),
+        type: z.enum(["LIMIT", "MARKET", "CLOSE_POSITION"]).optional().describe("Order type"),
+        quantity: z.number().optional().describe("Order quantity"),
+        side: z.enum(["BUY", "SELL"]).optional().describe("Order side"),
+        price: z.number().optional().describe("Order price"),
+        trigger_price: z.number().optional().describe("Trigger price"),
+        trigger_price_type: z.enum(["MARK_PRICE"]).optional().describe("Trigger price type"),
+        reduce_only: z.boolean().optional().describe("Reduce only flag"),
+        visible_quantity: z.boolean().optional().describe("Visible quantity flag"),
+        client_order_id: z.string().optional().describe("Custom order ID"),
+        order_tag: z.string().optional().describe("Order tag"),
+        child_orders: z.array(z.any()).optional().describe("Child orders for complex algos"),
+      },
+      async (params) => {
+        const result = await Orders.createAlgoOrder(params);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "edit_algo_order",
+      "Edit an existing algo order",
+      {
+        order_id: z.string().describe("Algo order ID to edit"),
+        quantity: z.number().optional().describe("New quantity"),
+        price: z.number().optional().describe("New price"),
+        trigger_price: z.number().optional().describe("New trigger price"),
+      },
+      async (params) => {
+        const result = await Orders.editAlgoOrder(params);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "cancel_algo_order",
+      "Cancel an algo order by order ID",
+      {
+        order_id: z.string().describe("Algo order ID to cancel"),
+      },
+      async ({ order_id }) => {
+        const result = await Orders.cancelAlgoOrder(order_id);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "cancel_algo_order_by_client_id",
+      "Cancel an algo order by client order ID",
+      {
+        client_order_id: z.string().describe("Client order ID to cancel"),
+      },
+      async ({ client_order_id }) => {
+        const result = await Orders.cancelAlgoOrderByClientId(client_order_id);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "cancel_all_pending_algo_orders",
+      "Cancel all pending algo orders",
+      {
+        symbol: z.string().optional().describe("Symbol to cancel algo orders for (optional)"),
+      },
+      async ({ symbol }) => {
+        const result = await Orders.cancelAllPendingAlgoOrders(symbol);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "get_algo_orders",
+      "Get algo orders with filtering options",
+      {
+        symbol: z.string().optional().describe("Filter by symbol"),
+        algo_type: z.enum(["STOP", "TP_SL", "POSITIONAL_TP_SL", "BRACKET"]).optional().describe("Filter by algo type"),
+        size: z.number().optional().describe("Page size"),
+        page: z.number().optional().describe("Page number"),
+      },
+      async (params) => {
+        const result = await Orders.getAlgoOrders(params);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "get_algo_order_by_id",
+      "Get algo order by order ID",
+      {
+        order_id: z.string().describe("Algo order ID to retrieve"),
+      },
+      async ({ order_id }) => {
+        const result = await Orders.getAlgoOrderById(order_id);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+    );
+
+    server.tool(
+      "get_algo_order_by_client_id",
+      "Get algo order by client order ID",
+      {
+        client_order_id: z.string().describe("Client order ID to retrieve"),
+      },
+      async ({ client_order_id }) => {
+        const result = await Orders.getAlgoOrderByClientId(client_order_id);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       }
     );
 
@@ -413,6 +621,24 @@ async function main() {
       }
     );
 
+    server.tool(
+      "get_position_history",
+      "Get position history",
+      {
+        symbol: z.string().optional().describe("Optional symbol to filter"),
+        limit: z.number().optional().describe("Optional limit for results"),
+      },
+      async ({ symbol, limit }) => {
+        const params: any = {};
+        if (symbol) params.symbol = symbol;
+        if (limit) params.limit = limit;
+        const result = await Positions.getPositionHistory(params);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+    );
+
     // Liquidation tools
     server.tool(
       "get_liquidations",
@@ -469,54 +695,37 @@ async function main() {
       }
     );
 
-    // WOOFi tools
     server.tool(
-      "create_woofi_order",
-      "Place an order via WOOFi Pro",
+      "get_funding_fee_history",
+      "Get funding fee history",
       {
-        tokenIn: z.string().describe("Input token address"),
-        tokenOut: z.string().describe("Output token address"),
-        amountIn: z.string().describe("Input amount"),
+        symbol: z.string().optional().describe("Optional symbol to filter"),
+        start_t: z.string().optional().describe("Start timestamp"),
+        end_t: z.string().optional().describe("End timestamp"),
+        page: z.string().optional().describe("Page number"),
+        size: z.string().optional().describe("Page size"),
       },
-      async (params) => {
-        const result = await WoofiClient.createWoofiOrder(params);
+      async ({ symbol, start_t, end_t, page, size }) => {
+        const params: any = {};
+        if (symbol) params.symbol = symbol;
+        if (start_t) params.start_t = start_t;
+        if (end_t) params.end_t = end_t;
+        if (page) params.page = page;
+        if (size) params.size = size;
+        const result = await Funding.getFundingFeeHistory(params);
         return {
           content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
     );
 
-    server.tool(
-      "get_woofi_portfolio",
-      "Get WOOFi portfolio",
-      {},
-      async () => {
-        const result = await WoofiClient.getWoofiPortfolio();
-        return {
-          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-        };
-      }
-    );
-
-    server.tool(
-      "get_woofi_tokens",
-      "Get available WOOFi tokens",
-      {},
-      async () => {
-        const result = await WoofiClient.getWoofiOrderHistory();
-        return {
-          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-        };
-      }
-    );
-
-    console.error("✅ All 18 trading tools registered successfully");
+    console.error("✅ All 29 trading tools registered successfully");
 
     // Use STDIO transport for Cursor IDE MCP integration
     const transport = new StdioServerTransport();
     await server.connect(transport);
     
-    console.error("🟢 WOOFi Pro MCP Server running locally via STDIO with 18 tools enabled");
+    console.error("🟢 WOOFi Pro MCP Server running locally via STDIO with 29 tools enabled");
   } catch (error) {
     console.error("❌ Server error:", error);
     process.exit(1);
