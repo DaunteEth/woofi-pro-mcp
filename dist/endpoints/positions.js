@@ -1,34 +1,52 @@
-import fetch from "node-fetch";
-import { createAuthHeaders, getBaseUrl } from "../utils/auth.js";
+import { signAndSendRequest, validateConfig } from '../utils/auth.js';
+/**
+ * Get all positions
+ */
 export async function getAllPositions() {
-    const path = "/v1/positions";
-    const headers = await createAuthHeaders("GET", path);
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}${path}`, {
-        method: "GET",
-        headers
-    });
-    return response.json();
+    validateConfig();
+    console.log('📋 Getting all positions...');
+    try {
+        const result = await signAndSendRequest('GET', '/v1/positions');
+        console.log('✅ All positions retrieved successfully:', result);
+        return result;
+    }
+    catch (error) {
+        console.error('❌ Failed to get positions:', error);
+        throw error;
+    }
 }
+/**
+ * Get position for a specific symbol
+ */
 export async function getPositionBySymbol(symbol) {
-    const path = "/v1/positions";
-    const baseUrl = getBaseUrl();
-    const url = new URL(`${baseUrl}${path}`);
-    url.searchParams.set("symbol", symbol);
-    const headers = await createAuthHeaders("GET", path);
-    const response = await fetch(url.toString(), {
-        method: "GET",
-        headers
-    });
-    return response.json();
+    validateConfig();
+    if (!symbol) {
+        throw new Error('Symbol is required');
+    }
+    console.log(`📋 Getting position for symbol: ${symbol}`);
+    try {
+        const result = await signAndSendRequest('GET', `/v1/position/${encodeURIComponent(symbol)}`);
+        console.log('✅ Position retrieved successfully:', result);
+        return result;
+    }
+    catch (error) {
+        console.error('❌ Failed to get position:', error);
+        throw error;
+    }
 }
-export async function getPositionInfo(symbol) {
-    const path = `/v1/position/${symbol}`;
-    const headers = await createAuthHeaders("GET", path);
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}${path}`, {
-        method: "GET",
-        headers
-    });
-    return response.json();
+/**
+ * Get aggregated positions
+ */
+export async function getAggregatedPositions() {
+    validateConfig();
+    console.log('📋 Getting aggregated positions...');
+    try {
+        const result = await signAndSendRequest('GET', '/v1/positions/aggregate');
+        console.log('✅ Aggregated positions retrieved successfully:', result);
+        return result;
+    }
+    catch (error) {
+        console.error('❌ Failed to get aggregated positions:', error);
+        throw error;
+    }
 }

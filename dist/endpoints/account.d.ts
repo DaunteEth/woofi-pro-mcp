@@ -1,2 +1,12 @@
-export declare function getAccountInfo(): Promise<unknown>;
-export declare function getPositions(symbol?: string): Promise<unknown>;
+/**
+ * Get account information
+ */
+export declare function getAccountInfo(): Promise<any>;
+/**
+ * Get account positions
+ */
+export declare function getAccountPositions(): Promise<any>;
+/**
+ * Get open orders
+ */
+export declare function getOpenOrders(): Promise<any>;

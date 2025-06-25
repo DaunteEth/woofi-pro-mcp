@@ -1,56 +1,86 @@
-import fetch from "node-fetch";
-import { createAuthHeaders, getBaseUrl } from "../utils/auth.js";
+import { z } from 'zod';
+import { signAndSendRequest, validateConfig } from '../utils/auth.js';
 
+// Zod schemas for input validation
+const withdrawRequestSchema = z.object({
+  token: z.string(),
+  amount: z.string(),
+  address: z.string(),
+  extra_memo: z.string().optional(),
+  network_type: z.string().optional(),
+});
+
+/**
+ * Get asset transaction history
+ */
 export async function getAssetHistory() {
-  const path = "/v1/asset/history";
-  const headers = await createAuthHeaders("GET", path);
-  const baseUrl = getBaseUrl();
+  validateConfig();
   
-  const response = await fetch(`${baseUrl}${path}`, {
-    method: "GET",
-    headers
-  });
+  console.log('📋 Getting asset history...');
   
-  return response.json();
+  try {
+    const result = await signAndSendRequest('GET', '/v1/asset/history');
+    console.log('✅ Asset history retrieved successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to get asset history:', error);
+    throw error;
+  }
 }
 
+/**
+ * Get asset holdings
+ */
 export async function getHoldings() {
-  const path = "/v1/asset/holding";
-  const headers = await createAuthHeaders("GET", path);
-  const baseUrl = getBaseUrl();
+  validateConfig();
   
-  const response = await fetch(`${baseUrl}${path}`, {
-    method: "GET",
-    headers
-  });
+  console.log('📋 Getting asset holdings...');
   
-  return response.json();
+  try {
+    const result = await signAndSendRequest('GET', '/v1/asset/holding');
+    console.log('✅ Asset holdings retrieved successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to get asset holdings:', error);
+    throw error;
+  }
 }
 
-export async function createWithdrawRequest(body: any) {
-  const path = "/v1/withdraw_request";
-  const requestBody = JSON.stringify(body);
-  const headers = await createAuthHeaders("POST", path, requestBody);
-  const baseUrl = getBaseUrl();
+/**
+ * Create a withdrawal request  
+ */
+export async function createWithdrawRequest(params: z.infer<typeof withdrawRequestSchema>) {
+  validateConfig();
   
-  const response = await fetch(`${baseUrl}${path}`, {
-    method: "POST",
-    headers,
-    body: requestBody
-  });
+  // Validate input parameters
+  const validatedParams = withdrawRequestSchema.parse(params);
   
-  return response.json();
+  console.log('📋 Creating withdrawal request:', validatedParams);
+  
+  try {
+    const result = await signAndSendRequest('POST', '/v1/withdraw_request', validatedParams);
+    console.log('✅ Withdrawal request created successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to create withdrawal request:', error);
+    throw error;
+  }
 }
 
+/**
+ * Settle PnL
+ */
 export async function settlePnl() {
-  const path = "/v1/pnl_settlement";
-  const headers = await createAuthHeaders("POST", path);
-  const baseUrl = getBaseUrl();
+  validateConfig();
   
-  const response = await fetch(`${baseUrl}${path}`, {
-    method: "POST",
-    headers
-  });
+  console.log('📋 Settling PnL...');
   
-  return response.json();
+  try {
+    const result = await signAndSendRequest('POST', '/v1/settle_pnl');
+    console.log('✅ PnL settled successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to settle PnL:', error);
+    throw error;
+  }
 } 

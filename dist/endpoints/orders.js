@@ -1,53 +1,162 @@
-import fetch from "node-fetch";
-import { createAuthHeaders, getBaseUrl } from "../utils/auth.js";
+import { z } from 'zod';
+import { signAndSendRequest, validateConfig } from '../utils/auth.js';
+// Zod schemas for input validation
+const orderParamsSchema = z.object({
+    symbol: z.string(),
+    side: z.enum(['BUY', 'SELL']),
+    order_type: z.enum(['LIMIT', 'MARKET', 'IOC', 'FOK', 'POST_ONLY', 'ASK', 'BID']),
+    order_price: z.number().optional(),
+    order_quantity: z.number().optional(),
+    order_amount: z.number().optional(),
+    client_order_id: z.string().optional(),
+    visible_quantity: z.number().optional(),
+    reduce_only: z.boolean().optional(),
+    slippage: z.number().optional(),
+    order_tag: z.string().optional(),
+    level: z.number().min(0).max(4).optional(),
+    order_amount_type: z.enum(['BASIC', 'PERCENTAGE']).optional(),
+    is_hedge: z.boolean().optional(),
+    post_only_adjust: z.boolean().optional(),
+});
+const batchOrderSchema = z.object({
+    orders: z.array(orderParamsSchema)
+});
+const orderQuerySchema = z.object({
+    symbol: z.string().optional(),
+    status: z.enum(['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELLED', 'REJECTED', 'INCOMPLETE', 'COMPLETED']).optional(),
+    tag: z.string().optional(),
+    order_type: z.enum(['LIMIT', 'MARKET', 'IOC', 'FOK', 'POST_ONLY', 'ASK', 'BID']).optional(),
+    order_tag: z.string().optional(),
+    side: z.enum(['BUY', 'SELL']).optional(),
+    start_t: z.number().optional(),
+    end_t: z.number().optional(),
+    size: z.number().optional(),
+    page: z.number().optional(),
+});
+/**
+ * Create an order
+ */
 export async function createOrder(params) {
-    const path = "/v1/order";
-    const body = JSON.stringify(params);
-    const headers = await createAuthHeaders("POST", path, body);
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}${path}`, {
-        method: "POST",
-        headers,
-        body
-    });
-    return response.json();
+    // Validate environment configuration
+    validateConfig();
+    // Validate input parameters
+    const validatedParams = orderParamsSchema.parse(params);
+    console.log(`📋 Creating order:`, validatedParams);
+    try {
+        const result = await signAndSendRequest('POST', '/v1/order', validatedParams);
+        console.log(`✅ Order created successfully:`, result);
+        return result;
+    }
+    catch (error) {
+        console.error(`❌ Failed to create order:`, error);
+        throw error;
+    }
 }
-export async function batchCreateOrders(batch) {
-    const path = "/v1/batch-order";
-    const body = JSON.stringify(batch);
-    const headers = await createAuthHeaders("POST", path, body);
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}${path}`, {
-        method: "POST",
-        headers,
-        body
-    });
-    return response.json();
+/**
+ * Cancel an order by ID
+ */
+export async function cancelOrder(orderId) {
+    // Validate environment configuration
+    validateConfig();
+    if (!orderId) {
+        throw new Error('Order ID is required');
+    }
+    console.log(`🚫 Cancelling order: ${orderId}`);
+    try {
+        const result = await signAndSendRequest('DELETE', `/v1/order/${orderId}`);
+        console.log(`✅ Order cancelled successfully:`, result);
+        return result;
+    }
+    catch (error) {
+        console.error(`❌ Failed to cancel order:`, error);
+        throw error;
+    }
 }
-export async function cancelOrder(orderId, symbol) {
-    const path = "/v1/order";
-    const body = JSON.stringify({ order_id: orderId, symbol });
-    const headers = await createAuthHeaders("DELETE", path, body);
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}${path}`, {
-        method: "DELETE",
-        headers,
-        body
-    });
-    return response.json();
+/**
+ * Cancel all pending orders for a symbol
+ */
+export async function cancelAllOrders(symbol) {
+    // Validate environment configuration
+    validateConfig();
+    const endpoint = symbol
+        ? `/v1/orders?symbol=${encodeURIComponent(symbol)}`
+        : '/v1/orders';
+    console.log(`🚫 Cancelling all orders${symbol ? ` for ${symbol}` : ''}`);
+    try {
+        const result = await signAndSendRequest('DELETE', endpoint);
+        console.log(`✅ Orders cancelled successfully:`, result);
+        return result;
+    }
+    catch (error) {
+        console.error(`❌ Failed to cancel orders:`, error);
+        throw error;
+    }
 }
-export async function getOrders(symbol, status) {
-    const path = "/v1/orders";
-    const baseUrl = getBaseUrl();
-    const url = new URL(`${baseUrl}${path}`);
-    if (symbol)
-        url.searchParams.set("symbol", symbol);
-    if (status)
-        url.searchParams.set("status", status);
-    const headers = await createAuthHeaders("GET", path);
-    const response = await fetch(url.toString(), {
-        method: "GET",
-        headers
+/**
+ * Get orders with optional filtering
+ */
+export async function getOrders(params) {
+    // Validate environment configuration
+    validateConfig();
+    // Validate and prepare query parameters
+    const validatedParams = params ? orderQuerySchema.parse(params) : {};
+    // Build query string
+    const queryParams = new URLSearchParams();
+    Object.entries(validatedParams).forEach(([key, value]) => {
+        if (value !== undefined) {
+            queryParams.append(key, value.toString());
+        }
     });
-    return response.json();
+    const endpoint = queryParams.toString()
+        ? `/v1/orders?${queryParams.toString()}`
+        : '/v1/orders';
+    console.log(`📋 Getting orders with params:`, validatedParams);
+    try {
+        const result = await signAndSendRequest('GET', endpoint);
+        console.log(`✅ Orders retrieved successfully:`, result);
+        return result;
+    }
+    catch (error) {
+        console.error(`❌ Failed to get orders:`, error);
+        throw error;
+    }
+}
+/**
+ * Get order by ID
+ */
+export async function getOrder(orderId) {
+    // Validate environment configuration
+    validateConfig();
+    if (!orderId) {
+        throw new Error('Order ID is required');
+    }
+    console.log(`📋 Getting order: ${orderId}`);
+    try {
+        const result = await signAndSendRequest('GET', `/v1/order/${orderId}`);
+        console.log(`✅ Order retrieved successfully:`, result);
+        return result;
+    }
+    catch (error) {
+        console.error(`❌ Failed to get order:`, error);
+        throw error;
+    }
+}
+/**
+ * Create multiple orders in batch
+ */
+export async function batchCreateOrders(params) {
+    // Validate environment configuration
+    validateConfig();
+    // Validate input parameters
+    const validatedParams = batchOrderSchema.parse(params);
+    console.log(`📋 Creating batch orders:`, validatedParams);
+    try {
+        const result = await signAndSendRequest('POST', '/v1/batch-order', validatedParams);
+        console.log(`✅ Batch orders created successfully:`, result);
+        return result;
+    }
+    catch (error) {
+        console.error(`❌ Failed to create batch orders:`, error);
+        throw error;
+    }
 }

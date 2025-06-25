@@ -1,50 +1,90 @@
-import fetch from "node-fetch";
-import { createAuthHeaders, getBaseUrl } from "../utils/auth.js";
+import { z } from 'zod';
+import { signAndSendRequest, getBaseUrl, validateConfig } from '../utils/auth.js';
 
+/**
+ * Get funding rates for symbols
+ */
 export async function getFundingRates(symbol?: string) {
-  const path = "/v1/funding_rates";
-  const baseUrl = getBaseUrl();
-  const url = new URL(`${baseUrl}${path}`);
-  if (symbol) url.searchParams.set("symbol", symbol);
+  validateConfig();
   
-  const headers = await createAuthHeaders("GET", path);
+  const endpoint = symbol 
+    ? `/v1/funding_rates?symbol=${encodeURIComponent(symbol)}`
+    : '/v1/funding_rates';
   
-  const response = await fetch(url.toString(), {
-    method: "GET",
-    headers
-  });
+  console.log(`📋 Getting funding rates${symbol ? ` for ${symbol}` : ''}...`);
   
-  return response.json();
+  try {
+    const result = await signAndSendRequest('GET', endpoint);
+    console.log('✅ Funding rates retrieved successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to get funding rates:', error);
+    throw error;
+  }
 }
 
+/**
+ * Get funding rate history for a symbol
+ */
 export async function getFundingRateHistory(symbol: string) {
-  const path = "/v1/funding_rate_history";
-  const baseUrl = getBaseUrl();
-  const url = new URL(`${baseUrl}${path}`);
-  url.searchParams.set("symbol", symbol);
+  validateConfig();
   
-  const headers = await createAuthHeaders("GET", path);
+  if (!symbol) {
+    throw new Error('Symbol is required');
+  }
   
-  const response = await fetch(url.toString(), {
-    method: "GET",
-    headers
-  });
+  console.log(`📋 Getting funding rate history for: ${symbol}`);
   
-  return response.json();
+  try {
+    const result = await signAndSendRequest('GET', `/v1/funding_rate_history?symbol=${encodeURIComponent(symbol)}`);
+    console.log('✅ Funding rate history retrieved successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to get funding rate history:', error);
+    throw error;
+  }
 }
 
+/**
+ * Get funding fee history
+ */
+export async function getFundingFeeHistory(symbol?: string) {
+  validateConfig();
+  
+  const endpoint = symbol 
+    ? `/v1/funding_fee/history?symbol=${encodeURIComponent(symbol)}`
+    : '/v1/funding_fee/history';
+  
+  console.log(`📋 Getting funding fee history${symbol ? ` for ${symbol}` : ''}...`);
+  
+  try {
+    const result = await signAndSendRequest('GET', endpoint);
+    console.log('✅ Funding fee history retrieved successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to get funding fee history:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get estimated funding rate for a symbol
+ */
 export async function getEstimatedFundingRate(symbol: string) {
-  const path = "/v1/estimated_funding_rate";
-  const baseUrl = getBaseUrl();
-  const url = new URL(`${baseUrl}${path}`);
-  url.searchParams.set("symbol", symbol);
+  validateConfig();
   
-  const headers = await createAuthHeaders("GET", path);
+  if (!symbol) {
+    throw new Error('Symbol is required');
+  }
   
-  const response = await fetch(url.toString(), {
-    method: "GET",
-    headers
-  });
+  console.log(`📋 Getting estimated funding rate for: ${symbol}`);
   
-  return response.json();
+  try {
+    const result = await signAndSendRequest('GET', `/v1/estimated_funding_rate?symbol=${encodeURIComponent(symbol)}`);
+    console.log('✅ Estimated funding rate retrieved successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to get estimated funding rate:', error);
+    throw error;
+  }
 } 

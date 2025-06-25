@@ -1,3 +1,12 @@
-export declare function getAllPositions(): Promise<unknown>;
-export declare function getPositionBySymbol(symbol: string): Promise<unknown>;
-export declare function getPositionInfo(symbol: string): Promise<unknown>;
+/**
+ * Get all positions
+ */
+export declare function getAllPositions(): Promise<any>;
+/**
+ * Get position for a specific symbol
+ */
+export declare function getPositionBySymbol(symbol: string): Promise<any>;
+/**
+ * Get aggregated positions
+ */
+export declare function getAggregatedPositions(): Promise<any>;

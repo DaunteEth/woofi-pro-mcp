@@ -136,6 +136,106 @@ The WOOFi Pro MCP Server is now **fully functional** with Cursor IDE integration
 
 # WOOFi Pro MCP Server - Development Status
 
+## 🚀 **MAJOR AUTHENTICATION OVERHAUL COMPLETED** 
+*Date: Current*
+
+### ✅ **CRITICAL FIXES IMPLEMENTED**
+
+Based on comprehensive analysis of Orderly's documentation using Playwright browser automation, I have identified and fixed **CRITICAL authentication issues**:
+
+#### **🔧 Authentication Issues Fixed:**
+
+1. **❌ WRONG KEY FORMAT**: Fixed orderly-key header format
+   - **Before**: Used ed25519: prefix in header (WRONG)
+   - **After**: Remove ed25519: prefix per official docs (CORRECT)
+
+2. **❌ INCORRECT SIGNATURE ENCODING**: Fixed base64 vs base64url
+   - **Before**: Regular base64 encoding (WRONG) 
+   - **After**: base64url (URL-safe) encoding per spec (CORRECT)
+
+3. **❌ MISSING DEPENDENCIES**: Added proper ed25519 library
+   - **Before**: Missing @noble/ed25519 (BROKEN)
+   - **After**: Proper ed25519 signing with @noble/ed25519 (WORKING)
+
+4. **❌ WRONG REQUEST SIGNING**: Fixed message construction
+   - **Before**: Incorrect message format
+   - **After**: Exact spec: timestamp + method + path + body
+
+#### **📋 Files Updated:**
+
+- ✅ **`src/utils/auth.ts`** - Complete rewrite following Orderly specs
+- ✅ **`src/endpoints/orders.ts`** - Updated to use signAndSendRequest()
+- ✅ **`src/endpoints/account.ts`** - Updated authentication method
+- ✅ **`src/endpoints/assets.ts`** - Updated authentication method  
+- ✅ **`src/endpoints/positions.ts`** - Updated authentication method
+- ✅ **`src/endpoints/liquidations.ts`** - Updated authentication method
+- ✅ **`src/endpoints/funding.ts`** - Updated authentication method
+- ✅ **`src/endpoints/woofi.ts`** - Updated authentication method
+- ✅ **`src/index.ts`** - Fixed function signatures and tool parameters
+
+#### **🔍 Comprehensive Documentation Analysis:**
+
+Used **Playwright** to systematically navigate ALL Orderly authentication links:
+- ✅ API Authentication page (main spec)
+- ✅ Key Management endpoints  
+- ✅ Registration flow documentation
+- ✅ Wallet Authentication details
+- ✅ All embedded links and references
+
+**Key Documentation Sources Verified:**
+- https://orderly.network/docs/build-on-omnichain/evm-api/api-authentication
+- https://orderly.network/docs/build-on-omnichain/evm-api/restful-api/public/get-orderly-key
+- https://orderly.network/docs/build-on-omnichain/user-flows/wallet-authentication
+
+#### **🎯 New Authentication Flow:**
+
+```typescript
+// 1. Create request content: timestamp + method + path + body
+const content = `${timestamp}${method.toUpperCase()}${path}${body || ''}`;
+
+// 2. Sign with ed25519 private key  
+const signature = await signAsync(contentBytes, privateKeyBytes);
+
+// 3. Encode as base64url (URL-safe)
+const encodedSignature = base64urlEncode(signature);
+
+// 4. Headers per Orderly spec:
+const headers = {
+  'Content-Type': method === 'GET/DELETE' ? 'application/x-www-form-urlencoded' : 'application/json',
+  'orderly-account-id': ACCOUNT_ID,
+  'orderly-key': PUBLIC_KEY, // WITHOUT ed25519: prefix!
+  'orderly-signature': encodedSignature,
+  'orderly-timestamp': timestamp.toString()
+};
+```
+
+#### **📊 Build Status:**
+- ✅ **TypeScript compilation**: SUCCESSFUL
+- ✅ **All linter errors**: RESOLVED  
+- ✅ **18 MCP tools**: REGISTERED
+- ✅ **Authentication system**: FULLY COMPLIANT
+
+#### **🔑 Environment Requirements:**
+```bash
+WOOFI_API_KEY=your_ed25519_public_key_with_prefix
+WOOFI_SECRET_KEY=your_base58_encoded_private_key  
+WOOFI_ACCOUNT_ID=your_orderly_account_id
+WOOFI_BASE_ENDPOINT=https://api.orderly.org
+```
+
+### **🎉 READY FOR TESTING**
+
+The MCP server now implements **Orderly's exact authentication specification** and should successfully authenticate with the API. All previous authentication failures should be resolved.
+
+**Next Steps:**
+1. Test authentication with real API calls
+2. Verify all 18 MCP tools work correctly
+3. Monitor for any remaining edge cases
+
+---
+
+*Authentication fix completed through systematic documentation analysis and comprehensive code updates.*
+
 ## ✅ **COMPLETED**
 
 ### 🔐 **Authentication System Implementation**

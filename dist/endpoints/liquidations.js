@@ -1,37 +1,56 @@
-import fetch from "node-fetch";
-import { createAuthHeaders, getBaseUrl } from "../utils/auth.js";
+import { z } from 'zod';
+import { signAndSendRequest, validateConfig } from '../utils/auth.js';
+// Zod schemas for input validation
+const claimLiquidationSchema = z.object({
+    liquidation_id: z.string(),
+});
+/**
+ * Get liquidation data
+ */
 export async function getLiquidations() {
-    const path = "/v1/liquidation";
-    const headers = await createAuthHeaders("GET", path);
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}${path}`, {
-        method: "GET",
-        headers
-    });
-    return response.json();
+    validateConfig();
+    console.log('📋 Getting liquidations...');
+    try {
+        const result = await signAndSendRequest('GET', '/v1/liquidation');
+        console.log('✅ Liquidations retrieved successfully:', result);
+        return result;
+    }
+    catch (error) {
+        console.error('❌ Failed to get liquidations:', error);
+        throw error;
+    }
 }
+/**
+ * Claim liquidation
+ */
 export async function claimLiquidation(params) {
-    const path = "/v1/liquidation";
-    const body = JSON.stringify(params);
-    const headers = await createAuthHeaders("POST", path, body);
-    const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}${path}`, {
-        method: "POST",
-        headers,
-        body
-    });
-    return response.json();
+    validateConfig();
+    // Validate input parameters
+    const validatedParams = claimLiquidationSchema.parse(params);
+    console.log('📋 Claiming liquidation:', validatedParams);
+    try {
+        const result = await signAndSendRequest('POST', '/v1/liquidation/claim', validatedParams);
+        console.log('✅ Liquidation claimed successfully:', result);
+        return result;
+    }
+    catch (error) {
+        console.error('❌ Failed to claim liquidation:', error);
+        throw error;
+    }
 }
-export async function getLiquidationHistory(symbol) {
-    const path = "/v1/liquidation/history";
-    const baseUrl = getBaseUrl();
-    const url = new URL(`${baseUrl}${path}`);
-    if (symbol)
-        url.searchParams.set("symbol", symbol);
-    const headers = await createAuthHeaders("GET", path);
-    const response = await fetch(url.toString(), {
-        method: "GET",
-        headers
-    });
-    return response.json();
+/**
+ * Get liquidation history
+ */
+export async function getLiquidationHistory() {
+    validateConfig();
+    console.log('📋 Getting liquidation history...');
+    try {
+        const result = await signAndSendRequest('GET', '/v1/liquidation/history');
+        console.log('✅ Liquidation history retrieved successfully:', result);
+        return result;
+    }
+    catch (error) {
+        console.error('❌ Failed to get liquidation history:', error);
+        throw error;
+    }
 }

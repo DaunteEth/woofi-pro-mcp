@@ -1,21 +1,12 @@
 /**
- * Create authentication headers for Orderly Network API
+ * Make authenticated request to Orderly API
  */
-export declare function createAuthHeaders(method: string, requestPath: string, body?: string): Promise<{
-    "Content-Type": string;
-    "orderly-timestamp": string;
-    "orderly-account-id": string;
-    "orderly-key": string;
-    "orderly-signature": string;
-}>;
+export declare function signAndSendRequest<T = any>(method: string, endpoint: string, data?: any): Promise<T>;
 /**
  * Get base URL for API requests
  */
 export declare function getBaseUrl(): string;
 /**
- * Validate required environment variables
+ * Validate that all required configuration is present
  */
-export declare function validateConfig(): {
-    isValid: boolean;
-    missingVars: string[];
-};
+export declare function validateConfig(): void;

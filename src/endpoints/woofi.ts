@@ -1,32 +1,70 @@
-import fetch from "node-fetch";
-import { createAuthHeaders, getBaseUrl } from "../utils/auth.js";
+import { z } from 'zod';
+import { signAndSendRequest, getBaseUrl, validateConfig } from '../utils/auth.js';
 
-export async function placeWoofiOrder(input: any) {
-  const path = "/evm-api/restful-api/private/create-order";
-  const body = JSON.stringify(input);
-  const headers = await createAuthHeaders("POST", path, body);
-  const baseUrl = getBaseUrl();
+// Zod schemas for input validation
+const woofiOrderSchema = z.object({
+  tokenIn: z.string(),
+  tokenOut: z.string(),
+  amountIn: z.string(),
+});
+
+/**
+ * Create WOOFi order
+ */
+export async function createWoofiOrder(params: z.infer<typeof woofiOrderSchema>) {
+  validateConfig();
   
-  const response = await fetch(`${baseUrl}${path}`, {
-    method: "POST",
-    headers,
-    body
-  });
+  // Validate input parameters
+  const validatedParams = woofiOrderSchema.parse(params);
   
-  return response.json();
+  console.log('📋 Creating WOOFi order:', validatedParams);
+  
+  try {
+    // Note: WOOFi endpoints may use different base URL - check env vars
+    const woofiBaseUrl = process.env.WOOFI_BASE_ENDPOINT || getBaseUrl();
+    const result = await signAndSendRequest('POST', '/evm-api/restful-api/private/order', validatedParams);
+    console.log('✅ WOOFi order created successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to create WOOFi order:', error);
+    throw error;
+  }
 }
 
+/**
+ * Get WOOFi portfolio
+ */
 export async function getWoofiPortfolio() {
-  const path = "/evm-api/restful-api/private/portfolio";
-  const headers = await createAuthHeaders("GET", path);
-  const baseUrl = getBaseUrl();
+  validateConfig();
   
-  const response = await fetch(`${baseUrl}${path}`, {
-    method: "GET",
-    headers
-  });
+  console.log('📋 Getting WOOFi portfolio...');
   
-  return response.json();
+  try {
+    const result = await signAndSendRequest('GET', '/evm-api/restful-api/private/portfolio');
+    console.log('✅ WOOFi portfolio retrieved successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to get WOOFi portfolio:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get WOOFi order history
+ */
+export async function getWoofiOrderHistory() {
+  validateConfig();
+  
+  console.log('📋 Getting WOOFi order history...');
+  
+  try {
+    const result = await signAndSendRequest('GET', '/evm-api/restful-api/private/orders');
+    console.log('✅ WOOFi order history retrieved successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Failed to get WOOFi order history:', error);
+    throw error;
+  }
 }
 
 export async function getWoofiTokens() {

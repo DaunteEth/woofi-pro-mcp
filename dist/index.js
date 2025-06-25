@@ -94,7 +94,7 @@ async function main() {
         server.tool("get_positions", "List open positions", {
             symbol: z.string().optional().describe("Optional symbol to filter positions"),
         }, async ({ symbol }) => {
-            const result = await Account.getPositions(symbol);
+            const result = await Account.getAccountPositions();
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
@@ -116,7 +116,7 @@ async function main() {
         server.tool("batch_create_orders", "Batch-create up to 10 orders", {
             orders: z.array(z.any()).describe("Array of order objects"),
         }, async ({ orders }) => {
-            const result = await Orders.batchCreateOrders({ orders });
+            const result = await Orders.batchCreateOrders({ orders: orders });
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
@@ -124,8 +124,8 @@ async function main() {
         server.tool("cancel_order", "Cancel an existing order", {
             order_id: z.string().describe("Order ID to cancel"),
             symbol: z.string().describe("Trading symbol"),
-        }, async ({ order_id, symbol }) => {
-            const result = await Orders.cancelOrder(order_id, symbol);
+        }, async ({ order_id }) => {
+            const result = await Orders.cancelOrder(order_id);
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
@@ -134,7 +134,12 @@ async function main() {
             symbol: z.string().optional().describe("Optional symbol to filter"),
             status: z.string().optional().describe("Optional status to filter"),
         }, async ({ symbol, status }) => {
-            const result = await Orders.getOrders(symbol, status);
+            const params = {};
+            if (symbol)
+                params.symbol = symbol;
+            if (status)
+                params.status = status;
+            const result = await Orders.getOrders(params);
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
@@ -221,7 +226,7 @@ async function main() {
             tokenOut: z.string().describe("Output token address"),
             amountIn: z.string().describe("Input amount"),
         }, async (params) => {
-            const result = await WoofiClient.placeWoofiOrder(params);
+            const result = await WoofiClient.createWoofiOrder(params);
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
@@ -233,26 +238,16 @@ async function main() {
             };
         });
         server.tool("get_woofi_tokens", "Get available WOOFi tokens", {}, async () => {
-            const result = await WoofiClient.getWoofiTokens();
+            const result = await WoofiClient.getWoofiOrderHistory();
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
         });
-        server.tool("get_woofi_quote", "Get WOOFi swap quote", {
-            tokenIn: z.string().describe("Input token address"),
-            tokenOut: z.string().describe("Output token address"),
-            amountIn: z.string().describe("Input amount"),
-        }, async ({ tokenIn, tokenOut, amountIn }) => {
-            const result = await WoofiClient.getWoofiQuote(tokenIn, tokenOut, amountIn);
-            return {
-                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-            };
-        });
-        console.error("✅ All 19 tools registered successfully");
+        console.error("✅ All 18 tools registered successfully");
         // Use STDIO transport for Cursor IDE MCP integration
         const transport = new StdioServerTransport();
         await server.connect(transport);
-        console.error("🟢 WOOFi Pro MCP Server running locally via STDIO with 19 tools enabled");
+        console.error("🟢 WOOFi Pro MCP Server running locally via STDIO with 18 tools enabled");
     }
     catch (error) {
         console.error("❌ Server error:", error);
