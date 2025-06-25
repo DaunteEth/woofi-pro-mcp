@@ -21,7 +21,7 @@ declare const withdrawRequestSchema: z.ZodObject<{
 declare const settlePnlRequestSchema: z.ZodObject<{
     signature: z.ZodString;
     userAddress: z.ZodString;
-    verifyingContract: z.ZodString;
+    verifyingContract: z.ZodDefault<z.ZodString>;
     message: z.ZodObject<{
         brokerId: z.ZodString;
         chainId: z.ZodNumber;
@@ -62,7 +62,7 @@ declare const settlePnlRequestSchema: z.ZodObject<{
     };
     signature: string;
     userAddress: string;
-    verifyingContract: string;
+    verifyingContract?: string | undefined;
 }>;
 declare const internalTransferSchema: z.ZodObject<{
     token: z.ZodString;

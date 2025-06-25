@@ -190,3 +190,70 @@ export function validateConfig() {
     console.log(`🔑 Account ID: ${ACCOUNT_ID}`);
     console.log(`🔐 Private Key: ${SECRET_KEY ? '[SET]' : 'NOT SET'}`);
 }
+/**
+ * Create EIP-712 domain for Orderly Network settlement
+ */
+function createEIP712Domain(chainId = 421614) {
+    return {
+        name: "Orderly",
+        version: "1",
+        chainId: chainId,
+        verifyingContract: "0x6F7a338F2aA472838dEFD3283eB360d4Dff5D203"
+    };
+}
+/**
+ * Create EIP-712 types for settlement
+ */
+function createSettlePnLTypes() {
+    return {
+        Settlement: [
+            { name: "brokerId", type: "string" },
+            { name: "chainId", type: "uint256" },
+            { name: "chainType", type: "string" },
+            { name: "settleNonce", type: "uint64" },
+            { name: "timestamp", type: "uint64" }
+        ]
+    };
+}
+/**
+ * Create EIP-712 types for liquidation claim
+ */
+function createLiquidationTypes() {
+    return {
+        ClaimLiquidation: [
+            { name: "brokerId", type: "string" },
+            { name: "chainId", type: "uint256" },
+            { name: "chainType", type: "string" },
+            { name: "liquidationId", type: "uint64" },
+            { name: "liquidatorId", type: "string" },
+            { name: "symbol", type: "string" },
+            { name: "positionQty", type: "string" },
+            { name: "costPosition", type: "string" },
+            { name: "liquidatorFee", type: "string" },
+            { name: "insuranceFundFee", type: "string" },
+            { name: "markPrice", type: "string" },
+            { name: "sumUnitaryFundings", type: "string" },
+            { name: "liquidatedTime", type: "uint64" },
+            { name: "timestamp", type: "uint64" }
+        ]
+    };
+}
+/**
+ * Create EIP-712 types for insurance fund claim
+ */
+function createInsuranceFundTypes() {
+    return {
+        ClaimInsuranceFund: [
+            { name: "brokerId", type: "string" },
+            { name: "chainId", type: "uint256" },
+            { name: "chainType", type: "string" },
+            { name: "liquidationId", type: "uint64" },
+            { name: "transferAmountToInsuranceFund", type: "string" },
+            { name: "timestamp", type: "uint64" }
+        ]
+    };
+}
+/**
+ * Export EIP-712 helper functions for use in endpoints
+ */
+export { createEIP712Domain, createSettlePnLTypes, createLiquidationTypes, createInsuranceFundTypes };

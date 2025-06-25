@@ -40,7 +40,7 @@
       "args": [
         "-y",
         "git+https://github.com/DaunteEth/execution-agent.git",
-        "woofi-pro"
+        "woofi-pro" 
       ]
     }
         

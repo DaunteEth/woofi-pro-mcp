@@ -13,7 +13,7 @@ const withdrawRequestSchema = z.object({
 const settlePnlRequestSchema = z.object({
   signature: z.string(),
   userAddress: z.string(),
-  verifyingContract: z.string(),
+  verifyingContract: z.string().default("0x6F7a338F2aA472838dEFD3283eB360d4Dff5D203"),
   message: z.object({
     brokerId: z.string(),
     chainId: z.number(),

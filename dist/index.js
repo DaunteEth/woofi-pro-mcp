@@ -526,34 +526,70 @@ async function main() {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
         });
-        server.tool("get_liquidation_history", "Get liquidation history", {
+        server.tool("get_positions_under_liquidation", "Get positions under liquidation (public)", {
             symbol: z.string().optional().describe("Optional symbol filter"),
             start_t: z.number().optional().describe("Start timestamp"),
             end_t: z.number().optional().describe("End timestamp"),
             page: z.number().optional().describe("Page number"),
             size: z.number().optional().describe("Page size"),
         }, async (params) => {
-            const result = await Liquidations.getLiquidationHistory(params);
+            const result = await Liquidations.getPositionsUnderLiquidation(params);
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };
         });
-        server.tool("get_liquidation_by_id", "Get liquidation details by ID", {
-            liquidation_id: z.string().describe("Liquidation ID"),
-        }, async ({ liquidation_id }) => {
-            const result = await Liquidations.getLiquidationById(liquidation_id);
-            return {
-                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
-            };
-        });
-        server.tool("get_liquidation_orders", "Get liquidation orders", {
-            symbol: z.string().optional().describe("Optional symbol filter"),
-            start_t: z.number().optional().describe("Start timestamp"),
-            end_t: z.number().optional().describe("End timestamp"),
-            page: z.number().optional().describe("Page number"),
-            size: z.number().optional().describe("Page size"),
+        server.tool("claim_liquidated_positions", "Claim liquidated positions (POST with EIP-712 signature)", {
+            liquidation_id: z.number().describe("Liquidation ID"),
+            liquidator_id: z.string().describe("Liquidator ID"),
+            symbol: z.string().describe("Trading symbol"),
+            position_qty: z.string().describe("Position quantity"),
+            cost_position: z.string().describe("Cost position"),
+            liquidator_fee: z.string().describe("Liquidator fee"),
+            insurance_fund_fee: z.string().describe("Insurance fund fee"),
+            mark_price: z.string().describe("Mark price"),
+            sum_unitary_fundings: z.string().describe("Sum unitary fundings"),
+            liquidated_time: z.number().describe("Liquidated time"),
+            signature: z.string().describe("EIP-712 signature"),
+            userAddress: z.string().describe("User wallet address"),
+            verifyingContract: z.string().describe("Verifying contract address"),
+            message: z.object({
+                brokerId: z.string(),
+                chainId: z.number(),
+                chainType: z.string(),
+                liquidationId: z.number(),
+                liquidatorId: z.string(),
+                symbol: z.string(),
+                positionQty: z.string(),
+                costPosition: z.string(),
+                liquidatorFee: z.string(),
+                insuranceFundFee: z.string(),
+                markPrice: z.string(),
+                sumUnitaryFundings: z.string(),
+                liquidatedTime: z.number(),
+                timestamp: z.number(),
+            }).describe("EIP-712 message object"),
         }, async (params) => {
-            const result = await Liquidations.getLiquidationOrders(params);
+            const result = await Liquidations.claimLiquidatedPositions(params);
+            return {
+                content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+            };
+        });
+        server.tool("claim_insurance_fund", "Claim insurance fund (POST with EIP-712 signature)", {
+            liquidation_id: z.number().describe("Liquidation ID"),
+            transfer_amount_to_insurance_fund: z.string().describe("Transfer amount to insurance fund"),
+            signature: z.string().describe("EIP-712 signature"),
+            userAddress: z.string().describe("User wallet address"),
+            verifyingContract: z.string().describe("Verifying contract address"),
+            message: z.object({
+                brokerId: z.string(),
+                chainId: z.number(),
+                chainType: z.string(),
+                liquidationId: z.number(),
+                transferAmountToInsuranceFund: z.string(),
+                timestamp: z.number(),
+            }).describe("EIP-712 message object"),
+        }, async (params) => {
+            const result = await Liquidations.claimInsuranceFund(params);
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
             };

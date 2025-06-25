@@ -8,6 +8,54 @@ const liquidationQuerySchema = z.object({
     page: z.number().optional(),
     size: z.number().optional(),
 });
+// Schema for claiming liquidated positions
+const claimLiquidationSchema = z.object({
+    liquidation_id: z.number(),
+    liquidator_id: z.string(),
+    symbol: z.string(),
+    position_qty: z.string(),
+    cost_position: z.string(),
+    liquidator_fee: z.string(),
+    insurance_fund_fee: z.string(),
+    mark_price: z.string(),
+    sum_unitary_fundings: z.string(),
+    liquidated_time: z.number(),
+    signature: z.string(),
+    userAddress: z.string(),
+    verifyingContract: z.string(),
+    message: z.object({
+        brokerId: z.string(),
+        chainId: z.number(),
+        chainType: z.string(),
+        liquidationId: z.number(),
+        liquidatorId: z.string(),
+        symbol: z.string(),
+        positionQty: z.string(),
+        costPosition: z.string(),
+        liquidatorFee: z.string(),
+        insuranceFundFee: z.string(),
+        markPrice: z.string(),
+        sumUnitaryFundings: z.string(),
+        liquidatedTime: z.number(),
+        timestamp: z.number(),
+    }),
+});
+// Schema for claiming insurance fund
+const claimInsuranceFundSchema = z.object({
+    liquidation_id: z.number(),
+    transfer_amount_to_insurance_fund: z.string(),
+    signature: z.string(),
+    userAddress: z.string(),
+    verifyingContract: z.string(),
+    message: z.object({
+        brokerId: z.string(),
+        chainId: z.number(),
+        chainType: z.string(),
+        liquidationId: z.number(),
+        transferAmountToInsuranceFund: z.string(),
+        timestamp: z.number(),
+    }),
+});
 /**
  * Get public liquidated positions (public endpoint)
  */
@@ -33,6 +81,34 @@ export async function getLiquidatedPositions(params) {
     }
     catch (error) {
         console.error('❌ Failed to get liquidated positions:', error);
+        throw error;
+    }
+}
+/**
+ * Get positions under liquidation (public endpoint)
+ */
+export async function getPositionsUnderLiquidation(params) {
+    validateConfig();
+    // Validate and prepare query parameters
+    const validatedParams = params ? liquidationQuerySchema.parse(params) : {};
+    // Build query string
+    const queryParams = new URLSearchParams();
+    Object.entries(validatedParams).forEach(([key, value]) => {
+        if (value !== undefined) {
+            queryParams.append(key, value.toString());
+        }
+    });
+    const endpoint = queryParams.toString()
+        ? `/v1/public/liquidation?${queryParams.toString()}`
+        : '/v1/public/liquidation';
+    console.log('📋 Getting positions under liquidation with params:', validatedParams);
+    try {
+        const result = await signAndSendRequest('GET', endpoint);
+        console.log('✅ Positions under liquidation retrieved successfully:', result);
+        return result;
+    }
+    catch (error) {
+        console.error('❌ Failed to get positions under liquidation:', error);
         throw error;
     }
 }
@@ -65,77 +141,38 @@ export async function getLiquidations(params) {
     }
 }
 /**
- * Get liquidation history (private endpoint)
+ * Claim liquidated positions (private POST endpoint)
  */
-export async function getLiquidationHistory(params) {
+export async function claimLiquidatedPositions(params) {
     validateConfig();
-    // Validate and prepare query parameters
-    const validatedParams = params ? liquidationQuerySchema.parse(params) : {};
-    // Build query string
-    const queryParams = new URLSearchParams();
-    Object.entries(validatedParams).forEach(([key, value]) => {
-        if (value !== undefined) {
-            queryParams.append(key, value.toString());
-        }
-    });
-    const endpoint = queryParams.toString()
-        ? `/v1/liquidation/history?${queryParams.toString()}`
-        : '/v1/liquidation/history';
-    console.log('📋 Getting liquidation history with params:', validatedParams);
+    // Validate input parameters
+    const validatedParams = claimLiquidationSchema.parse(params);
+    console.log('📋 Claiming liquidated positions:', validatedParams);
     try {
-        const result = await signAndSendRequest('GET', endpoint);
-        console.log('✅ Liquidation history retrieved successfully:', result);
+        const result = await signAndSendRequest('POST', '/v1/liquidation', validatedParams);
+        console.log('✅ Liquidated positions claimed successfully:', result);
         return result;
     }
     catch (error) {
-        console.error('❌ Failed to get liquidation history:', error);
+        console.error('❌ Failed to claim liquidated positions:', error);
         throw error;
     }
 }
 /**
- * Get liquidation details by ID (private endpoint)
+ * Claim insurance fund (private POST endpoint)
  */
-export async function getLiquidationById(liquidationId) {
+export async function claimInsuranceFund(params) {
     validateConfig();
-    if (!liquidationId) {
-        throw new Error('Liquidation ID is required');
-    }
-    console.log(`📋 Getting liquidation details for ID: ${liquidationId}`);
+    // Validate input parameters
+    const validatedParams = claimInsuranceFundSchema.parse(params);
+    console.log('📋 Claiming insurance fund:', validatedParams);
     try {
-        const result = await signAndSendRequest('GET', `/v1/liquidation/${encodeURIComponent(liquidationId)}`);
-        console.log('✅ Liquidation details retrieved successfully:', result);
+        const result = await signAndSendRequest('POST', '/v1/claim_insurance_fund', validatedParams);
+        console.log('✅ Insurance fund claimed successfully:', result);
         return result;
     }
     catch (error) {
-        console.error('❌ Failed to get liquidation details:', error);
-        throw error;
-    }
-}
-/**
- * Get liquidation orders (private endpoint)
- */
-export async function getLiquidationOrders(params) {
-    validateConfig();
-    // Validate and prepare query parameters
-    const validatedParams = params ? liquidationQuerySchema.parse(params) : {};
-    // Build query string
-    const queryParams = new URLSearchParams();
-    Object.entries(validatedParams).forEach(([key, value]) => {
-        if (value !== undefined) {
-            queryParams.append(key, value.toString());
-        }
-    });
-    const endpoint = queryParams.toString()
-        ? `/v1/liquidation/orders?${queryParams.toString()}`
-        : '/v1/liquidation/orders';
-    console.log('📋 Getting liquidation orders with params:', validatedParams);
-    try {
-        const result = await signAndSendRequest('GET', endpoint);
-        console.log('✅ Liquidation orders retrieved successfully:', result);
-        return result;
-    }
-    catch (error) {
-        console.error('❌ Failed to get liquidation orders:', error);
+        console.error('❌ Failed to claim insurance fund:', error);
         throw error;
     }
 }
