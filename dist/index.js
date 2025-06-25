@@ -80,6 +80,8 @@ function validateAuthenticationConfig() {
         // Use existing validateConfig() from auth.ts - just checks env vars, no API calls
         validateConfig();
         console.error("✅ Authentication configuration validated");
+        console.error("🔄 Cache Bust:", new Date().toISOString());
+        console.error("📦 Auth Version: 1.0.1 - WORKING AUTHENTICATION");
         return true;
     }
     catch (error) {
@@ -100,7 +102,7 @@ async function main() {
         }
         const server = new McpServer({
             name: "woofi-pro",
-            version: "1.0.0",
+            version: "1.0.1",
         }, {
             capabilities: {
                 tools: {},
