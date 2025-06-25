@@ -159,6 +159,11 @@ export async function signAndSendRequest(method, endpoint, data) {
     }
     console.log(`🔐 Making authenticated ${method} request to: ${url}`);
     console.log('📋 Headers:', Object.keys(headers).map(k => `${k}: ${k.includes('signature') ? '[SIGNATURE]' : headers[k]}`));
+    console.log('🔍 DEBUG - Full headers for troubleshooting:');
+    console.log('  orderly-timestamp:', headers['orderly-timestamp']);
+    console.log('  orderly-account-id:', headers['orderly-account-id']);
+    console.log('  orderly-key:', headers['orderly-key']);
+    console.log('  orderly-signature:', headers['orderly-signature']);
     const response = await fetch(url, options);
     if (!response.ok) {
         const errorText = await response.text();
