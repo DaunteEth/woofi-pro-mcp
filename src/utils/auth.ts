@@ -1,8 +1,7 @@
-import { signAsync } from '@noble/ed25519';
+import { signAsync, getPublicKeyAsync } from '@noble/ed25519';
 
 // Environment variables - default to mainnet to match MCP configuration
 const BASE_URL = process.env.WOOFI_BASE_ENDPOINT || "https://api.orderly.org";
-const API_KEY = process.env.WOOFI_API_KEY; // This should be the ed25519 public key WITH prefix
 const SECRET_KEY = process.env.WOOFI_SECRET_KEY; // This should be the base58 encoded private key
 const ACCOUNT_ID = process.env.WOOFI_ACCOUNT_ID;
 
@@ -62,24 +61,63 @@ function decodeBase58(s: string): Uint8Array {
 }
 
 /**
+ * Encode Uint8Array to base58
+ */
+function encodeBase58(bytes: Uint8Array): string {
+  if (bytes.length === 0) return '';
+  
+  // Convert to big integer
+  let num = 0n;
+  for (const byte of bytes) {
+    num = num * 256n + BigInt(byte);
+  }
+  
+  // Convert to base58
+  let result = '';
+  while (num > 0) {
+    result = BASE58_ALPHABET[Number(num % 58n)] + result;
+    num = num / 58n;
+  }
+  
+  // Handle leading zeros
+  for (const byte of bytes) {
+    if (byte === 0) result = '1' + result;
+    else break;
+  }
+  
+  return result;
+}
+
+/**
+ * Derive the public key from private key for use in orderly-key header
+ */
+async function derivePublicKey(privateKeyBase58: string): Promise<string> {
+  const privateKeyBytes = decodeBase58(privateKeyBase58);
+  const publicKeyBytes = await getPublicKeyAsync(privateKeyBytes);
+  return encodeBase58(publicKeyBytes);
+}
+
+/**
  * Create normalized request content for signing per Orderly spec:
- * timestamp + HTTP_METHOD + path + body (if any)
+ * timestamp + HTTP_METHOD + path + query + body (if any)
+ * Following the exact pattern from official documentation
  */
 function createSignatureContent(
   timestamp: number,
   method: string,
-  path: string,
+  url: URL,
   body?: any
 ): string {
-  let content = `${timestamp}${method.toUpperCase()}${path}`;
+  let message = `${timestamp}${method.toUpperCase()}${url.pathname}${url.search}`;
   if (body && method !== 'GET' && method !== 'DELETE') {
-    content += JSON.stringify(body);
+    message += JSON.stringify(body);
   }
-  return content;
+  return message;
 }
 
 /**
  * Sign request using ed25519 and return base64url encoded signature
+ * Following the exact pattern from official Orderly documentation
  */
 async function signRequest(
   content: string,
@@ -94,34 +132,34 @@ async function signRequest(
   // Sign with ed25519
   const signature = await signAsync(contentBytes, privateKeyBytes);
   
-  // Return base64url encoded signature (URL-safe)
-  return base64urlEncode(signature);
+  // Return base64url encoded signature (matches official example: Buffer.from(signature).toString('base64url'))
+  return Buffer.from(signature).toString('base64url');
 }
 
 /**
  * Create authentication headers per Orderly specification
+ * Following the exact pattern from official Orderly documentation
  */
 async function createAuthHeaders(
   method: string,
-  path: string,
+  fullUrl: string,
   body?: any
 ): Promise<Record<string, string>> {
-  if (!API_KEY || !SECRET_KEY || !ACCOUNT_ID) {
-    throw new Error('Missing required environment variables: WOOFI_API_KEY, WOOFI_SECRET_KEY, WOOFI_ACCOUNT_ID');
+  if (!SECRET_KEY || !ACCOUNT_ID) {
+    throw new Error('Missing required environment variables: WOOFI_SECRET_KEY, WOOFI_ACCOUNT_ID');
   }
 
   const timestamp = Date.now();
+  const url = new URL(fullUrl);
   
   // Create content to sign
-  const content = createSignatureContent(timestamp, method, path, body);
+  const content = createSignatureContent(timestamp, method, url, body);
   
   // Sign the content
   const signature = await signRequest(content, SECRET_KEY);
   
-  // Clean orderly key - remove ed25519: prefix if present
-  const cleanOrderlyKey = API_KEY.startsWith('ed25519:') 
-    ? API_KEY.substring(8) 
-    : API_KEY;
+  // Derive the public key from the private key (as per Orderly docs)
+  const publicKeyBase58 = await derivePublicKey(SECRET_KEY);
 
   // Content-Type per Orderly spec
   const contentType = (method === 'GET' || method === 'DELETE') 
@@ -131,7 +169,7 @@ async function createAuthHeaders(
   return {
     'Content-Type': contentType,
     'orderly-account-id': ACCOUNT_ID,
-    'orderly-key': cleanOrderlyKey, // WITHOUT ed25519: prefix
+    'orderly-key': `ed25519:${publicKeyBase58}`, // MUST include ed25519: prefix per official docs
     'orderly-signature': signature,
     'orderly-timestamp': timestamp.toString()
   };
@@ -139,6 +177,7 @@ async function createAuthHeaders(
 
 /**
  * Make authenticated request to Orderly API
+ * Following the exact pattern from official Orderly documentation  
  */
 export async function signAndSendRequest<T = any>(
   method: string,
@@ -147,8 +186,8 @@ export async function signAndSendRequest<T = any>(
 ): Promise<T> {
   const url = `${BASE_URL}${endpoint}`;
   
-  // Create authentication headers
-  const headers = await createAuthHeaders(method, endpoint, data);
+  // Create authentication headers using full URL (matches official example)
+  const headers = await createAuthHeaders(method, url, data);
   
   // Prepare request options
   const options: RequestInit = {
@@ -190,10 +229,9 @@ export function getBaseUrl(): string {
  * Validate that all required configuration is present
  */
 export function validateConfig(): void {
-  if (!API_KEY || !SECRET_KEY || !ACCOUNT_ID) {
+  if (!SECRET_KEY || !ACCOUNT_ID) {
     throw new Error(
       'Missing required environment variables. Please check:\n' +
-      '- WOOFI_API_KEY (your ed25519 public key)\n' +
       '- WOOFI_SECRET_KEY (your base58 encoded private key)\n' +
       '- WOOFI_ACCOUNT_ID (your Orderly account ID)'
     );
@@ -202,6 +240,5 @@ export function validateConfig(): void {
   console.log(`🔧 Auth config validated:`);
   console.log(`📍 Base URL: ${BASE_URL}`);
   console.log(`🔑 Account ID: ${ACCOUNT_ID}`);
-  console.log(`🗝️  Public Key: ${API_KEY ? API_KEY.substring(0, 20) + '...' : 'NOT SET'}`);
   console.log(`🔐 Private Key: ${SECRET_KEY ? '[SET]' : 'NOT SET'}`);
 } 
