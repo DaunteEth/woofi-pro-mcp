@@ -266,7 +266,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- **WOOFi Pro**: [https://pro.woo.org](https://pro.woo.org)
+- **WOOFi Pro**: [https://pro.woo.org](https://pro.woofi.com)
 - **Orderly Network**: [https://orderly.network](https://orderly.network)
 - **Documentation**: [https://orderly.network/docs](https://orderly.network/docs)
 - **GitHub Repository**: [https://github.com/DaunteEth/execution-agent](https://github.com/DaunteEth/woofi-pro-mcp)
