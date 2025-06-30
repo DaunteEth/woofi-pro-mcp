@@ -63,7 +63,7 @@ npx -y git+https://github.com/DaunteEth/woofi-pro-mcp woofi-pro \
 
 **Windsurf:**
 ```bash
-npx -y git+https://github.com/DaunteEh/execution-agent.git woofi-pro \
+npx -y git+https://github.com/DaunteEth/woofi-pro-mcp.git woofi-pro \
   --client windsurf \
   --api-key=your_orderly_api_key_here \
   --secret-key=your_orderly_secret_key_here \
@@ -149,7 +149,7 @@ Add credentials directly to your MCP config:
 ## 🔧 API Credentials Setup
 
 ### 🔑 Get API Credentials
-1. **Visit**: [WOOFi Pro](https://pro.woo.org)
+1. **Visit**: [WOOFi Pro](https://pro.woofi.com)
 2. **Complete KYC**: Identity verification required
 3. **Generate API Keys**: API Management → Create API keys
 4. **Set Permissions**: Enable `read` and `trading` permissions
@@ -269,7 +269,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **WOOFi Pro**: [https://pro.woo.org](https://pro.woo.org)
 - **Orderly Network**: [https://orderly.network](https://orderly.network)
 - **Documentation**: [https://orderly.network/docs](https://orderly.network/docs)
-- **GitHub Repository**: [https://github.com/DaunteEth/execution-agent](https://github.com/DaunteEh/execution-agent)
+- **GitHub Repository**: [https://github.com/DaunteEth/execution-agent](https://github.com/DaunteEth/woofi-pro-mcp)
 
 ---
 
