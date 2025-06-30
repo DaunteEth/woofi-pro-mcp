@@ -114,7 +114,7 @@ export async function updateMCPConfig(configPath: string, credentials: MCPCreden
     command: 'npx',
     args: [
       '-y',
-      'git+https://github.com/DaunteEth/execution-agent.git',
+      'git+https://github.com/DaunteEth/woofi-pro-mcp.git',
       'woofi-pro'
     ],
     env: {

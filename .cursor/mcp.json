@@ -1,48 +1,12 @@
 {
   "mcpServers": {
-        "server-sequential-thinking": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "@smithery/cli@latest",
-                "run",
-                "@smithery-ai/server-sequential-thinking",
-                "--key",
-                "d7b9248a-dede-410a-b259-1f8b3b1b37d7"
-            ]
-        },
-        "perplexity-search": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "@smithery/cli@latest",
-                "run",
-                "@arjunkmrm/perplexity-search",
-                "--key",
-                "d7b9248a-dede-410a-b259-1f8b3b1b37d7",
-                "--profile",
-                "future-secretary-Qx3XkJ"
-            ]
-        },
-        "context7-mcp": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "@smithery/cli@latest",
-                "run",
-                "@upstash/context7-mcp",
-                "--key",
-                "d7b9248a-dede-410a-b259-1f8b3b1b37d7"
-            ]
-        },
-        "woofi-pro": {
+    "woofi-pro": {
       "command": "npx",
       "args": [
         "-y",
-        "git+https://github.com/DaunteEth/execution-agent.git",
+        "git+https://github.com/DaunteEth/woofi-pro-mcp.git",
         "woofi-pro" 
       ]
     }
-        
-    }
+  }
 }

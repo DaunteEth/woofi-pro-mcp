@@ -35,3 +35,5 @@ temp/
 .smithery/
 smithery.yaml
 plugin-manifest.json
+
+status.md

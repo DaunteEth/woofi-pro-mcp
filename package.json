@@ -26,7 +26,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/DaunteEth/execution-agent.git"
+		"url": "git+https://github.com/DaunteEth/woofi-pro-mcp.git"
 	},
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.12.1",

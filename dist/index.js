@@ -102,7 +102,7 @@ function initializeConfig() {
         console.error("❌ Configuration error:", error);
         console.error("");
         console.error("📖 For detailed setup instructions, visit:");
-        console.error("   https://github.com/DaunteEth/execution-agent#setup");
+        console.error("   https://github.com/DaunteEth/woofi-pro-mcp#setup");
         console.error("");
         throw error;
     }
@@ -153,11 +153,11 @@ async function handleCLICommands() {
             console.error('');
             console.error('💡 Examples:');
             console.error('   # Configure for Claude Desktop');
-            console.error('   npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \\');
+            console.error('   npx -y git+https://github.com/DaunteEth/woofi-pro-mcp.git woofi-pro \\');
             console.error('     --client claude --api-key=your_key --secret-key=your_secret --account-id=your_id');
             console.error('');
             console.error('   # Configure for Cursor IDE');
-            console.error('   npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \\');
+            console.error('   npx -y git+https://github.com/DaunteEth/woofi-pro-mcp.git woofi-pro \\');
             console.error('     --client cursor --api-key=your_key --secret-key=your_secret --account-id=your_id');
             process.exit(1);
         }

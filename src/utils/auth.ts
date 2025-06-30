@@ -11,28 +11,6 @@ const ACCOUNT_ID = process.env.WOOFI_ACCOUNT_ID;
 const BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
 /**
- * Base64url encode (URL-safe base64 without padding)
- */
-function base64urlEncode(bytes: Uint8Array): string {
-  let result = '';
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-  
-  let i = 0;
-  while (i < bytes.length) {
-    const a = bytes[i++];
-    const b = i < bytes.length ? bytes[i++] : 0;
-    const c = i < bytes.length ? bytes[i++] : 0;
-    
-    result += chars[a >> 2];
-    result += chars[((a & 3) << 4) | (b >> 4)];
-    if (i - 1 < bytes.length) result += chars[((b & 15) << 2) | (c >> 6)];
-    if (i - 1 < bytes.length) result += chars[c & 63];
-  }
-  
-  return result;
-}
-
-/**
  * Decode base58 to Uint8Array
  */
 function decodeBase58(s: string): Uint8Array {

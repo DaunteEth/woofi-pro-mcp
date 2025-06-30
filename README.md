@@ -3,12 +3,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-A **Model Context Protocol (MCP)** server providing **18 comprehensive trading tools** for WOOFi Pro and Orderly Network integration. Built for **universal compatibility** with Cursor IDE, Claude Desktop, Windsurf, and all MCP-compatible applications.
+A **Model Context Protocol (MCP)** server providing **40 comprehensive trading tools** for WOOFi Pro and Orderly Network integration. Built for **universal compatibility** with Cursor IDE, Claude Desktop, Windsurf, and all MCP-compatible applications.
 
 ## ✨ Features
 
 - **🎯 Platform-Specific Configuration**: Smithery-style commands for precise MCP client targeting
-- **18 Trading Tools**: Complete suite for DeFi and derivatives trading
+- **40 Trading Tools**: Complete suite for DeFi and derivatives trading
 - **Orderly Network API**: Direct integration with institutional-grade infrastructure  
 - **Universal Compatibility**: Works with Cursor, Claude Desktop, Windsurf, and all MCP clients
 - **Flexible Setup**: Auto-config, .env files, OR direct config - all methods supported
@@ -17,118 +17,51 @@ A **Model Context Protocol (MCP)** server providing **18 comprehensive trading t
 - **Multi-Platform Support**: Claude Desktop, Cursor IDE, VSCode, and Windsurf
 - **Safe Config Management**: Creates backups before making any changes
 
-## 🎯 Available Tools
+## 🎯 Available Tools (40 Total)
 
-| Category | Tools | Description |
-|----------|--------|-------------|
-| **Account** | `get_account_info` | Account information and key details |
-| **Positions** | `get_all_positions`, `get_position_by_symbol` | Position tracking and management |
-| **Orders** | `create_order`, `cancel_order`, `get_orders`, `batch_create_orders` | Order management and execution |
-| **Assets** | `get_asset_history`, `get_holdings`, `create_withdraw_request` | Asset and balance operations |
-| **Trading** | `settle_pnl` | PnL settlement operations |
-| **Funding** | `get_funding_rates`, `get_funding_rate_history` | Funding rate data |
-| **Liquidations** | `get_liquidations`, `claim_liquidation` | Liquidation monitoring |
-| **WOOFi** | `create_woofi_order`, `get_woofi_portfolio`, `get_woofi_tokens` | WOOFi Pro integration |
+| Category | Count | Tools | Description |
+|----------|-------|--------|-------------|
+| **Account** | 3 | `get_account_info`, `get_positions`, `get_orders` | Account information and key details |
+| **Orders** | 18 | `create_order`, `batch_create_orders`, `edit_order`, `cancel_order`, `cancel_order_by_client_id`, `cancel_all_pending_orders`, `cancel_all_after`, `get_orders`, `get_order_by_id`, `get_order_by_client_id`, `create_algo_order`, `edit_algo_order`, `cancel_algo_order`, `cancel_algo_order_by_client_id`, `cancel_all_pending_algo_orders`, `get_algo_orders`, `get_algo_order_by_id`, `get_algo_order_by_client_id` | Complete order management and execution |
+| **Assets** | 8 | `get_asset_history`, `get_holdings`, `create_withdraw_request`, `get_settle_pnl_nonce`, `request_pnl_settlement`, `get_pnl_settlement_history`, `create_internal_transfer`, `get_internal_transfer_history` | Asset operations, PnL settlement, and transfers |
+| **Positions** | 3 | `get_all_positions`, `get_position_by_symbol`, `get_position_history` | Position tracking and management |
+| **Liquidations** | 6 | `get_liquidated_positions`, `get_liquidations`, `get_positions_under_liquidation`, `claim_liquidated_positions`, `claim_insurance_fund`, `get_insurance_fund` | Liquidation monitoring and claims |
+| **Funding** | 1 | `get_funding_fee_history` | Funding rate data and history |
 
-## 🚀 Universal Setup (CCXT-Style)
+## 🚀 Quick Setup
 
-### Choose Your Setup Method:
-
-**🎯 Option A: Platform-Specific Configuration** *(NEW! Smithery-Style Commands)*
-
-**For Claude Desktop:**
-```bash
-npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \
-  --client claude \
-  --api-key=your_api_key \
-  --secret-key=your_secret_key \
-  --account-id=your_account_id
-```
-
-**For Cursor IDE:**
-```bash
-npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \
-  --client cursor \
-  --api-key=your_api_key \
-  --secret-key=your_secret_key \
-  --account-id=your_account_id
-```
-
-**For VSCode:**
-```bash
-npx -y git+https://github.com/DaunteEh/execution-agent.git woofi-pro \
-  --client vscode \
-  --api-key=your_api_key \
-  --secret-key=your_secret_key \
-  --account-id=your_account_id
-```
-
-**For Windsurf:**
-```bash
-npx -y git+https://github.com/DaunteEh/execution-agent.git woofi-pro \
-  --client windsurf \
-  --api-key=your_api_key \
-  --secret-key=your_secret_key \
-  --account-id=your_account_id
-```
-
-*✅ Advantages: **Precise targeting**, follows MCP standards, explicit control*
-
-**🟦 Option B: .env File Method** *(Recommended for development)*
-```bash
-# 1. Copy environment template
-cp .env.example .env
-# 2. Edit .env with your API credentials
-# 3. Use simple MCP config (no env vars!)
-```
-*✅ Advantages: Keep secrets in gitignored files, easy to manage multiple environments*
-
-**🟩 Option C: Config File Method** *(Manual configuration)*
-```bash
-# 1. Add credentials directly to your MCP config
-# 2. No .env file needed!
-# 3. Everything in one place
-```
-*✅ Advantages: Full control, custom configurations, manual environment management*
-
-**✅ Supported Platforms:**
-- **Cursor IDE** 
-- **Claude Desktop**
-- **Windsurf**
-- **Any MCP Client**
-
-## 🎯 Platform-Specific Configuration (NEW!)
+### 🎯 Option A: Auto-Configuration (Recommended)
 
 **Choose your platform and configure instantly** - Smithery-style commands:
 
-### **Claude Desktop** 
+**Claude Desktop:**
 ```bash
-npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \
+npx -y git+https://github.com/DaunteEth/woofi-pro-mcp woofi-pro \
   --client claude \
   --api-key=your_orderly_api_key_here \
   --secret-key=your_orderly_secret_key_here \
   --account-id=your_account_id_here
 ```
 
-### **Cursor IDE**
+**Cursor IDE:**
 ```bash
-npx -y git+https://github.com/DaunteEth/execution-agent.git woofi-pro \
+npx -y git+https://github.com/DaunteEth/woofi-pro-mcp woofi-pro \
   --client cursor \
   --api-key=your_orderly_api_key_here \
   --secret-key=your_orderly_secret_key_here \
   --account-id=your_account_id_here
 ```
 
-### **VSCode**
+**VSCode:**
 ```bash
-npx -y git+https://github.com/DaunteEh/execution-agent.git woofi-pro \
+npx -y git+https://github.com/DaunteEth/woofi-pro-mcp woofi-pro \
   --client vscode \
   --api-key=your_orderly_api_key_here \
   --secret-key=your_orderly_secret_key_here \
   --account-id=your_account_id_here
 ```
 
-### **Windsurf**
+**Windsurf:**
 ```bash
 npx -y git+https://github.com/DaunteEh/execution-agent.git woofi-pro \
   --client windsurf \
@@ -143,20 +76,7 @@ npx -y git+https://github.com/DaunteEh/execution-agent.git woofi-pro \
 - ⚙️ **Updates your MCP config** with WOOFi Pro server + credentials
 - ✅ **Ready to use immediately** - just restart your MCP application!
 
-**Example output:**
-```
-🚀 Configuring WOOFi Pro for CLAUDE...
-🎯 Target: Claude Desktop
-📂 Config: /Users/username/Library/Application Support/Claude/claude_desktop_config.json
-🎉 Configuration complete for Claude Desktop!
-📱 Please restart Claude Desktop to load the new configuration.
-```
-
----
-
-### Manual Configuration Options
-
-#### 🟦 Option B: .env File Method
+### 🟦 Option B: .env File Method
 
 **Step 1: Create .env file**
 ```bash
@@ -172,7 +92,7 @@ cp .env.example .env
       "command": "npx",
       "args": [
         "-y",
-        "git+https://github.com/DaunteEth/execution-agent.git",
+        "git+https://github.com/DaunteEth/woofi-pro-mcp",
         "woofi-pro"
       ]
     }
@@ -180,14 +100,11 @@ cp .env.example .env
 }
 ```
 
-#### 🟩 Option C: Config File Method (No .env needed!)
+### 🟩 Option C: Direct Config Method
 
-**Claude Desktop** *(Manual setup)*
+Add credentials directly to your MCP config:
 
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`  
-**Linux**: `~/.config/Claude/claude_desktop_config.json`
-
+**Claude Desktop** *(macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`)*
 ```json
 {
   "mcpServers": {
@@ -195,7 +112,7 @@ cp .env.example .env
       "command": "npx",
       "args": [
         "-y",
-        "git+https://github.com/DaunteEth/execution-agent.git",
+        "git+https://github.com/DaunteEth/woofi-pro-mcp",
         "woofi-pro"
       ],
       "env": {
@@ -216,7 +133,7 @@ cp .env.example .env
       "command": "npx",
       "args": [
         "-y",
-        "git+https://github.com/DaunteEth/execution-agent.git",
+        "git+https://github.com/DaunteEh/execution-agent.git",
         "woofi-pro"
       ],
       "env": {
@@ -229,57 +146,46 @@ cp .env.example .env
 }
 ```
 
-**Windsurf & Other MCP Clients**
+## 🔧 API Credentials Setup
 
-Use either approach - both are supported by the MCP standard!
-
-> **🔒 Security Note**: Both approaches are equally secure! Option A keeps secrets in .env files (gitignored), Option B keeps them in your local MCP config (never shared). Our codebase never contains any secrets - they're always user-provided.
-
-## 🔧 Environment Setup
-
-### 🔑 Get API Credentials (Required for both methods)
+### 🔑 Get API Credentials
 1. **Visit**: [WOOFi Pro](https://pro.woo.org)
-2. **Complete KYC**: Identity verification
-3. **Generate API Keys**: API Management → Create keys
-4. **Permissions**: Enable `read` and `trading`
+2. **Complete KYC**: Identity verification required
+3. **Generate API Keys**: API Management → Create API keys
+4. **Set Permissions**: Enable `read` and `trading` permissions
+5. **Copy Credentials**: You'll need 3 values:
+   - API Key
+   - Secret Key  
+   - Account ID
 
-### 🟦 Option A: .env File Setup
-
-**1. Copy Template**
+### 📁 .env File Template
 ```bash
-cp .env.example .env
-```
-
-**2. Edit .env File**
-```bash
-# Only 3 variables needed!
+# WOOFi Pro API Credentials (Required)
 WOOFI_API_KEY=your_orderly_api_key_here
 WOOFI_SECRET_KEY=your_orderly_secret_key_here
 WOOFI_ACCOUNT_ID=your_account_id_here
 ```
 
-### 🟩 Option B: Direct Config Setup
+## 🔒 Security Architecture
 
-**1. Get your 3 credentials from step above**
+### ✅ Non-Sensitive (Hardcoded)
+The following standard values are hardcoded for simplicity and are **not sensitive**:
+- `WOOFI_BASE_ENDPOINT=https://api.orderly.org` - Public API endpoint
+- `WOOFI_BROKER_ID=woofi_pro` - Standard broker identifier
+- `WOOFI_CHAIN_ID=42161` - Arbitrum network chain ID
 
-**2. Add them directly to your MCP config** (see examples above)
-- Replace `your_orderly_api_key_here` with your actual API key
-- Replace `your_orderly_secret_key_here` with your actual secret key  
-- Replace `your_account_id_here` with your actual account ID
-
-**3. Restart your MCP client** (Claude Desktop, Cursor, etc.)
-
-### 🔒 Security: Hardcoded vs Configurable
-
-**🔧 Hardcoded (Standard Values):**
-- `WOOFI_BASE_ENDPOINT=https://api.orderly.org` - Never changes
-- `WOOFI_BROKER_ID=woofi_pro` - Our standard broker ID
-- `WOOFI_CHAIN_ID=42161` - Arbitrum network
-
-**🔑 Configurable (User-Specific):**
+### 🔑 Sensitive (User-Provided)
+These values must be provided by you and are **never hardcoded**:
 - `WOOFI_API_KEY` - Your unique API key
-- `WOOFI_SECRET_KEY` - Your private key  
+- `WOOFI_SECRET_KEY` - Your private secret key  
 - `WOOFI_ACCOUNT_ID` - Your account identifier
+
+### 🛡️ Security Features
+- **🔒 Zero hardcoded secrets** - Following 2025 MCP security best practices
+- **📁 .env files gitignored** - Secrets never committed to version control
+- **🔐 Automatic .env loading** - Server finds .env in working directory
+- **✅ Input validation** - All parameters validated with Zod schemas
+- **🏗️ Separation of concerns** - Public constants separate from private credentials
 
 ## 💡 Usage Examples
 
@@ -312,40 +218,43 @@ await create_order({
 });
 ```
 
-### Monitor Positions
+### Advanced Features
 ```typescript
-// Get all positions
-await get_all_positions({});
+// PnL Settlement
+await get_settle_pnl_nonce({});
+await request_pnl_settlement({
+  signature: "0x...",
+  userAddress: "0x...",
+  // ... EIP-712 signature data
+});
 
-// Check specific symbol
-await get_position_by_symbol({ symbol: "PERP_BTC_USDC" });
+// Liquidation Claims  
+await claim_liquidated_positions({
+  liquidation_id: 12345,
+  // ... liquidation claim data
+});
 ```
 
-## 🔄 Commands You Can Use
+## 🔄 Natural Language Commands
 
 ### Account & Portfolio
 - "Show me my account balance"
 - "What are my current positions?"
 - "Get my asset transaction history"
+- "Check my PnL settlement history"
 
 ### Trading
 - "Place a market buy order for 0.001 BTC"
 - "Create a limit sell order for 0.1 ETH at $3500"
 - "Cancel order ID 12345"
 - "Show me my recent orders"
+- "Create a batch of orders"
 
-### Analysis
-- "What are the current funding rates?"
-- "Check funding rate history for BTC"
-- "Show me liquidation data"
-
-## 🛡️ Security Features
-
-- **🔒 No API keys in config files** - Following 2025 MCP security best practices
-- **📁 .env files gitignored** - Secrets never committed to version control
-- **🔐 Automatic .env loading** - Server finds .env in working directory
-- **✅ Input validation** - All parameters validated with Zod schemas
-- **🏗️ Hardcoded standards** - Non-sensitive values hardcoded for simplicity
+### Advanced Operations
+- "Get my settle PnL nonce"
+- "Show me liquidated positions"
+- "Check funding fee history for BTC"
+- "Create an internal transfer"
 
 ## 🤝 Contributing
 
@@ -360,8 +269,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **WOOFi Pro**: [https://pro.woo.org](https://pro.woo.org)
 - **Orderly Network**: [https://orderly.network](https://orderly.network)
 - **Documentation**: [https://orderly.network/docs](https://orderly.network/docs)
-- **GitHub Repository**: [https://github.com/DaunteEth/execution-agent](https://github.com/DaunteEth/execution-agent)
+- **GitHub Repository**: [https://github.com/DaunteEth/execution-agent](https://github.com/DaunteEh/execution-agent)
 
 ---
 
-⚡ **Ready to trade?** Follow the 3-step setup above and start trading with natural language! 
+⚡ **Ready to trade?** Follow the quick setup above and start trading with natural language! 

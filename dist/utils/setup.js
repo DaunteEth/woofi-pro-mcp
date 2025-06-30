@@ -41,7 +41,7 @@ Restart your MCP client (Cursor/Claude Desktop/etc.) and you're ready to trade!
 
 📚 **Documentation:**
 - Orderly API Docs: https://orderly.network/docs/build-on-omnichain/evm-api/api-authentication
-- GitHub Repository: https://github.com/DaunteEth/execution-agent
+- GitHub Repository: https://github.com/DaunteEth/woofi-pro-mcp
   `.trim();
 }
 /**
